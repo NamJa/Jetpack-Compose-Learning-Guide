@@ -1,0 +1,400 @@
+/* ==========================================================================
+   Flexbox Interactive Playground
+   Controls panel + live preview + generated code output
+   ========================================================================== */
+
+/* ==========================================================================
+   Main Container
+   ========================================================================== */
+
+.flexbox-playground {
+  margin: 24px 0;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  overflow: hidden;
+  background: var(--bg-card, #22223b);
+  transition: var(--transition-colors, background-color 0.3s ease);
+}
+
+.flexbox-playground-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--bg-secondary, #282c34);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.flexbox-playground-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0aec0);
+}
+
+.flexbox-playground-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-muted, rgba(97, 218, 251, 0.15));
+  color: var(--accent, #61dafb);
+}
+
+/* ==========================================================================
+   Content: Controls + Preview Grid
+   ========================================================================== */
+
+.flexbox-playground-content {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 400px;
+}
+
+/* ==========================================================================
+   Controls Panel
+   ========================================================================== */
+
+.flexbox-controls {
+  padding: 16px;
+  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  overflow-y: auto;
+  background: var(--bg-secondary, #282c34);
+}
+
+.flexbox-controls-section {
+  margin-bottom: 16px;
+}
+
+.flexbox-controls-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #718096);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.flexbox-controls label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--text-muted, #718096);
+  font-weight: 500;
+}
+
+.flexbox-controls select {
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  background: var(--bg-primary, #1a1a2e);
+  color: var(--text-primary, #e0e0e0);
+  border: 1px solid var(--border-color-strong, rgba(255, 255, 255, 0.2));
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+.flexbox-controls select:hover {
+  border-color: var(--accent, #61dafb);
+}
+
+.flexbox-controls select:focus {
+  border-color: var(--accent, #61dafb);
+  box-shadow: 0 0 0 2px var(--accent-muted, rgba(97, 218, 251, 0.15));
+}
+
+.flexbox-controls input[type="number"] {
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  background: var(--bg-primary, #1a1a2e);
+  color: var(--text-primary, #e0e0e0);
+  border: 1px solid var(--border-color-strong, rgba(255, 255, 255, 0.2));
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.flexbox-controls input[type="number"]:focus {
+  border-color: var(--accent, #61dafb);
+  box-shadow: 0 0 0 2px var(--accent-muted, rgba(97, 218, 251, 0.15));
+}
+
+/* Add/remove child buttons */
+.flexbox-child-controls {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.flexbox-child-btn {
+  flex: 1;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color-strong, rgba(255, 255, 255, 0.2));
+  background: transparent;
+  color: var(--text-secondary, #a0aec0);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.flexbox-child-btn:hover {
+  border-color: var(--accent, #61dafb);
+  background: var(--accent-muted, rgba(97, 218, 251, 0.15));
+}
+
+/* ==========================================================================
+   Preview Area
+   ========================================================================== */
+
+.flexbox-preview-area {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flexbox-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #718096);
+  margin-bottom: 8px;
+}
+
+.flexbox-preview {
+  flex: 1;
+  border: 2px dashed var(--text-muted, #718096);
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 200px;
+  position: relative;
+  transition: border-color 0.2s ease;
+  /* Default flex properties — JS will override via inline styles */
+  display: flex;
+}
+
+.flexbox-preview:hover {
+  border-color: var(--accent, #61dafb);
+}
+
+/* ==========================================================================
+   Flex Children
+   ========================================================================== */
+
+.flexbox-child {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.flexbox-child:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+/* Child color palette */
+.flexbox-child:nth-child(1) {
+  background-color: #e94560;
+}
+
+.flexbox-child:nth-child(2) {
+  background-color: #61dafb;
+}
+
+.flexbox-child:nth-child(3) {
+  background-color: #4ecdc4;
+}
+
+.flexbox-child:nth-child(4) {
+  background-color: #f5a623;
+}
+
+.flexbox-child:nth-child(5) {
+  background-color: #a855f7;
+}
+
+/* Cycle colors for additional children */
+.flexbox-child:nth-child(6) {
+  background-color: #e94560;
+}
+
+.flexbox-child:nth-child(7) {
+  background-color: #61dafb;
+}
+
+.flexbox-child:nth-child(8) {
+  background-color: #4ecdc4;
+}
+
+.flexbox-child:nth-child(9) {
+  background-color: #f5a623;
+}
+
+.flexbox-child:nth-child(10) {
+  background-color: #a855f7;
+}
+
+/* Child size variants */
+.flexbox-child.size-sm {
+  min-width: 30px;
+  min-height: 30px;
+  font-size: 10px;
+}
+
+.flexbox-child.size-md {
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.flexbox-child.size-lg {
+  min-width: 70px;
+  min-height: 70px;
+}
+
+/* ==========================================================================
+   Generated Code Output
+   ========================================================================== */
+
+.flexbox-code-output {
+  margin-top: 12px;
+  padding: 12px;
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  border-radius: 8px;
+  background: var(--bg-code, #1e1e2e);
+  color: var(--text-primary, #e0e0e0);
+  white-space: pre;
+  overflow-x: auto;
+  position: relative;
+}
+
+.flexbox-code-output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.flexbox-code-output-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #718096);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.flexbox-code-copy-btn {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: transparent;
+  color: var(--text-muted, #718096);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.flexbox-code-copy-btn:hover {
+  color: var(--accent, #61dafb);
+  border-color: var(--accent, #61dafb);
+}
+
+/* ==========================================================================
+   Android/RN Note
+   ========================================================================== */
+
+.flexbox-android-note {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-muted, #718096);
+  line-height: 1.5;
+}
+
+.flexbox-android-note code {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  background: var(--bg-code, #1e1e2e);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-style: normal;
+}
+
+/* ==========================================================================
+   Mobile Responsive — Single Column
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .flexbox-playground-content {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .flexbox-controls {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    padding: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  /* Two-column controls layout on mobile to save space */
+  .flexbox-controls-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+    margin-bottom: 12px;
+  }
+
+  .flexbox-controls-section-title {
+    grid-column: 1 / -1;
+  }
+
+  .flexbox-preview-area {
+    padding: 12px;
+  }
+
+  .flexbox-preview {
+    min-height: 150px;
+  }
+
+  .flexbox-code-output {
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .flexbox-child {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 10px;
+  }
+}

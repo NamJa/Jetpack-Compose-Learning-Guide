@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Theme Toggle System
+   Dark theme (default) / Light theme via [data-theme="light"]
+   ========================================================================== */
+
+:root {
+  /* --- Dark Theme (Default) --- */
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #282c34;
+  --bg-tertiary: #2d3748;
+  --bg-code: #1e1e2e;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-card: #22223b;
+
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0aec0;
+  --text-muted: #718096;
+  --text-inverse: #1a1a2e;
+
+  --accent: #61dafb;
+  --accent-hover: #79e3ff;
+  --accent-muted: rgba(97, 218, 251, 0.15);
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-strong: rgba(255, 255, 255, 0.2);
+
+  --success: #4ecdc4;
+  --success-bg: rgba(78, 205, 196, 0.15);
+  --error: #e94560;
+  --error-bg: rgba(233, 69, 96, 0.15);
+  --warning: #f5a623;
+  --warning-bg: rgba(245, 166, 35, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+  --transition-colors: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* --- Light Theme Overrides --- */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8edf2;
+  --bg-code: #f0f2f5;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-card: #ffffff;
+
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --text-inverse: #ffffff;
+
+  --accent: #087ea4;
+  --accent-hover: #065d7a;
+  --accent-muted: rgba(8, 126, 164, 0.12);
+
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-color-strong: rgba(0, 0, 0, 0.2);
+
+  --success: #2a9d8f;
+  --success-bg: rgba(42, 157, 143, 0.12);
+  --error: #d63031;
+  --error-bg: rgba(214, 48, 49, 0.1);
+  --warning: #e17055;
+  --warning-bg: rgba(225, 112, 85, 0.1);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* --- Smooth Transitions on Theme Change --- */
+body,
+.sidebar,
+.sidebar-nav,
+.content,
+.markdown-section,
+.app-nav,
+.search,
+.progress-bar-container,
+.progress-dropdown,
+.quiz-container,
+.compare-container,
+.playground-container,
+.flexbox-playground {
+  transition: var(--transition-colors);
+}
+
+/* ==========================================================================
+   Theme Toggle Button
+   ========================================================================== */
+
+.theme-toggle-btn {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  z-index: 50;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 50%;
+  background: var(--bg-tertiary, #2d3748);
+  color: var(--text-secondary, #a0aec0);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--accent, #61dafb);
+  box-shadow: 0 0 8px var(--accent-muted, rgba(97, 218, 251, 0.15));
+  transform: scale(1.1);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent, #61dafb);
+  outline-offset: 2px;
+}
+
+/* Icon states */
+.theme-toggle-btn .icon-sun,
+.theme-toggle-btn .icon-moon {
+  display: none;
+  pointer-events: none;
+}
+
+/* Dark mode: show sun icon (to switch to light) */
+:root:not([data-theme="light"]) .theme-toggle-btn .icon-sun,
+html:not([data-theme="light"]) .theme-toggle-btn .icon-sun {
+  display: inline;
+}
+
+/* Light mode: show moon icon (to switch to dark) */
+[data-theme="light"] .theme-toggle-btn .icon-moon {
+  display: inline;
+}
+[data-theme="light"] .theme-toggle-btn .icon-sun {
+  display: none;
+}

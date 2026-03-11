@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Jetpack Compose 학습 로드맵</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="신입 Android 개발자를 위한 Jetpack Compose 학습 가이드">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <!-- Theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/theme-toggle.css">
+  <link rel="stylesheet" href="assets/css/progress-bar.css">
+  <link rel="stylesheet" href="assets/css/progress.css">
+  <link rel="stylesheet" href="assets/css/quiz.css">
+  <link rel="stylesheet" href="assets/css/compare-viewer.css">
+  <link rel="stylesheet" href="assets/css/playground.css">
+  <!-- Gamification CSS -->
+  <link rel="stylesheet" href="assets/css/gamification.css">
+  <link rel="stylesheet" href="assets/css/exercises.css">
+  <link rel="stylesheet" href="assets/css/lesson-mode.css">
+  <link rel="stylesheet" href="assets/css/skill-tree.css">
+  <link rel="stylesheet" href="assets/css/review.css">
+  <style>
+    :root {
+      --base-font-size: 15px;
+      --theme-color: #3DDC84;
+      --sidebar-width: 280px;
+      --sidebar-nav-link-color--active: #3DDC84;
+      --sidebar-nav-link-border-color--active: #3DDC84;
+      --code-theme-background: #1a1a2e;
+      --code-inline-color: #3DDC84;
+      --heading-color: #e0e0e0;
+    }
+    .sidebar-nav > ul > li > a {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .sidebar-nav li ul li a {
+      font-size: 13px;
+    }
+    .markdown-section h1 {
+      border-bottom: 2px solid #3DDC84;
+      padding-bottom: 8px;
+    }
+    .markdown-section table {
+      display: table;
+      width: 100%;
+    }
+    .app-name-link img {
+      max-width: 40px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <!-- Gamification Core (load FIRST) -->
+  <script src="assets/js/core/gamification-core.js"></script>
+  <script src="assets/js/core/sound.js"></script>
+  <script src="assets/js/core/confetti.js"></script>
+  <!-- Custom Plugins (load BEFORE docsify so $docsify.plugins is set) -->
+  <script src="assets/js/plugins/docsify-theme-toggle.js"></script>
+  <script src="assets/js/plugins/docsify-progress.js"></script>
+  <script src="assets/js/plugins/docsify-checklist.js"></script>
+  <script src="assets/js/plugins/docsify-quiz.js"></script>
+  <script src="assets/js/plugins/docsify-compare.js"></script>
+  <script src="assets/js/plugins/docsify-playground.js"></script>
+  <script src="assets/js/plugins/docsify-exercises.js"></script>
+  <script src="assets/js/plugins/docsify-gamification-ui.js"></script>
+  <script src="assets/js/plugins/docsify-lesson-mode.js"></script>
+  <script src="assets/js/plugins/docsify-review.js"></script>
+  <script src="assets/js/components/skill-tree.js"></script>
+  <script>
+    window.$docsify = window.$docsify || {};
+    Object.assign(window.$docsify, {
+      name: '🤖 Jetpack Compose 학습 로드맵',
+      repo: '',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        placeholder: '검색어를 입력하세요',
+        noData: '결과가 없습니다',
+        depth: 3,
+      },
+      pagination: {
+        previousText: '이전',
+        nextText: '다음',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      copyCode: {
+        buttonText: '복사',
+        errorText: '오류',
+        successText: '복사됨!',
+      },
+      tabs: {
+        persist: true,
+        sync: false,
+        theme: 'material',
+      },
+    });
+  </script>
+  <!-- Docsify -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <!-- Docsify Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1/dist/docsify-tabs.min.js"></script>
+  <!-- Mermaid -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+      hook.doneEach(function() {
+        document.querySelectorAll('.markdown-section pre[data-lang="mermaid"]').forEach(function(pre) {
+          var code = pre.querySelector('code');
+          if (!code) return;
+          var div = document.createElement('div');
+          div.className = 'mermaid';
+          div.textContent = code.textContent;
+          pre.parentNode.replaceChild(div, pre);
+        });
+        mermaid.run();
+      });
+    });
+  </script>
+  <!-- Syntax Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-kotlin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-groovy.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-xml-doc.min.js"></script>
+</body>
+</html>

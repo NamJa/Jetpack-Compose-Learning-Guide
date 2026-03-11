@@ -1,0 +1,335 @@
+/* ==========================================================================
+   Code Playground
+   Editor, toolbar, output, and Expo Snack embed
+   ========================================================================== */
+
+/* ==========================================================================
+   Playground Container
+   ========================================================================== */
+
+.playground-container {
+  margin: 24px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-card, #22223b);
+  transition: var(--transition-colors, background-color 0.3s ease);
+}
+
+/* ==========================================================================
+   Toolbar
+   ========================================================================== */
+
+.playground-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary, #282c34);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  gap: 8px;
+}
+
+.playground-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playground-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.playground-lang-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #718096);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-muted, rgba(97, 218, 251, 0.15));
+  color: var(--accent, #61dafb);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.playground-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: none;
+  background: var(--accent, #61dafb);
+  color: var(--text-inverse, #1a1a2e);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.playground-run-btn:hover {
+  background: var(--accent-hover, #79e3ff);
+  transform: scale(1.03);
+}
+
+.playground-run-btn:active {
+  transform: scale(0.97);
+}
+
+.playground-run-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.playground-run-btn:focus-visible {
+  outline: 2px solid var(--accent, #61dafb);
+  outline-offset: 2px;
+}
+
+.playground-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color-strong, rgba(255, 255, 255, 0.2));
+  background: transparent;
+  color: var(--text-muted, #718096);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.playground-reset-btn:hover {
+  color: var(--text-secondary, #a0aec0);
+  border-color: var(--text-muted, #718096);
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+}
+
+.playground-reset-btn:active {
+  transform: scale(0.97);
+}
+
+.playground-reset-btn:focus-visible {
+  outline: 2px solid var(--accent, #61dafb);
+  outline-offset: 2px;
+}
+
+/* Copy button */
+.playground-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: transparent;
+  color: var(--text-muted, #718096);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.playground-copy-btn:hover {
+  color: var(--accent, #61dafb);
+  border-color: var(--accent, #61dafb);
+}
+
+/* ==========================================================================
+   Editor Area
+   ========================================================================== */
+
+.playground-editor {
+  min-height: 120px;
+  background: var(--bg-code, #1e1e2e);
+  position: relative;
+}
+
+/* CodeMirror overrides when embedded */
+.playground-editor .CodeMirror {
+  height: auto;
+  min-height: 120px;
+  background: var(--bg-code, #1e1e2e);
+  color: var(--text-primary, #e0e0e0);
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Plain textarea fallback */
+.playground-editor textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: none;
+  background: var(--bg-code, #1e1e2e);
+  color: var(--text-primary, #e0e0e0);
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  tab-size: 2;
+}
+
+/* ==========================================================================
+   Output Area
+   ========================================================================== */
+
+.playground-output {
+  padding: 12px;
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 40px;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-tertiary, #2d3748);
+  color: var(--text-secondary, #a0aec0);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+  transition: var(--transition-colors, background-color 0.3s ease);
+}
+
+.playground-output.error {
+  color: var(--error, #e94560);
+}
+
+.playground-output.success {
+  color: var(--success, #4ecdc4);
+}
+
+.playground-output-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #718096);
+  margin-bottom: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   Expo Snack Embed
+   ========================================================================== */
+
+.snack-embed-container {
+  margin: 24px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-card, #22223b);
+}
+
+.snack-embed-container iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
+  display: block;
+}
+
+.snack-embed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary, #282c34);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.snack-embed-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0aec0);
+}
+
+.snack-embed-link {
+  font-size: 12px;
+  color: var(--accent, #61dafb);
+  text-decoration: none;
+}
+
+.snack-embed-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Snack Placeholder (Lazy Load)
+   ========================================================================== */
+
+.snack-placeholder {
+  text-align: center;
+  padding: 40px;
+  cursor: pointer;
+  border: 2px dashed var(--border-color-strong, rgba(255, 255, 255, 0.2));
+  border-radius: 12px;
+  margin: 24px 0;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  color: var(--text-muted, #718096);
+  font-size: 14px;
+}
+
+.snack-placeholder:hover {
+  border-color: var(--accent, #61dafb);
+  background: var(--accent-muted, rgba(97, 218, 251, 0.15));
+  color: var(--accent, #61dafb);
+}
+
+.snack-placeholder-icon {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.snack-placeholder-text {
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .playground-container {
+    margin: 16px 0;
+    border-radius: 8px;
+  }
+
+  .playground-toolbar {
+    flex-wrap: wrap;
+    padding: 6px 8px;
+  }
+
+  .playground-run-btn,
+  .playground-reset-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .playground-output {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .snack-embed-container iframe {
+    height: 400px;
+  }
+
+  .snack-placeholder {
+    padding: 24px;
+  }
+}
