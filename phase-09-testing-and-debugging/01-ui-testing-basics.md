@@ -67,7 +67,7 @@ Compose의 UI 테스트는 **시맨틱 트리(Semantics Tree)** 를 기반으로
 
 Compose UI 테스트를 위해 `build.gradle.kts`에 다음 종속성을 추가합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts (Module :app)
 
 // Compose BOM으로 버전 통합 관리 (Compose UI Test 1.10.4, Material3 1.4.0 포함)
@@ -114,7 +114,7 @@ dependencies {
 
 가장 기본적인 테스트 룰입니다. **Activity 없이** 컴포저블을 테스트할 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Rule
 import org.junit.Test
@@ -143,7 +143,7 @@ class GreetingTest {
 
 특정 Activity의 컨텍스트가 필요할 때 사용합니다. 테마, 리소스, Intent 등에 접근할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
@@ -202,7 +202,7 @@ class MainScreenTest {
 └─────────────────────────────────────────┘
 ```
 
-```kotlin
+```kotlin [compose-playground]
 @Test
 fun counter_incrementsOnClick() {
     // 1단계: setContent — 테스트할 UI 설정
@@ -235,7 +235,7 @@ fun counter_incrementsOnClick() {
 
 **텍스트로 노드를 찾습니다.** 가장 흔하게 사용됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 정확히 일치하는 텍스트 찾기
 composeTestRule
     .onNodeWithText("로그인")
@@ -256,7 +256,7 @@ composeTestRule
 
 **testTag로 노드를 찾습니다.** 텍스트가 변경될 수 있거나, 동일한 텍스트가 여러 개 있을 때 유용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 컴포저블에 testTag 지정
 TextField(
     value = text,
@@ -274,7 +274,7 @@ composeTestRule
 
 **접근성 설명(Content Description)으로 노드를 찾습니다.** 이미지나 아이콘 버튼에 유용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 컴포저블에 contentDescription 지정
 Icon(
     imageVector = Icons.Default.Search,
@@ -291,7 +291,7 @@ composeTestRule
 
 **커스텀 매처를 조합해서 노드를 찾습니다.** 복잡한 조건이 필요할 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasTestTag
@@ -311,7 +311,7 @@ composeTestRule
 
 동일한 조건에 매칭되는 노드가 여러 개일 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 모든 매칭 노드 가져오기
 composeTestRule
     .onAllNodesWithText("항목")
@@ -356,7 +356,7 @@ testTag를 추가할 수 있는가? ──→ onNodeWithTag
 
 가장 기본적인 클릭 액션입니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 버튼 클릭
 composeTestRule
     .onNodeWithText("저장")
@@ -367,7 +367,7 @@ composeTestRule
 
 화면에 보이지 않는 노드까지 스크롤합니다. `LazyColumn`이 아닌 일반 스크롤 가능한 컨테이너에서 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 스크롤해서 노드가 보이도록 한 후 클릭
 composeTestRule
     .onNodeWithText("맨 아래 항목")
@@ -379,7 +379,7 @@ composeTestRule
 
 텍스트 필드에 텍스트를 입력합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 텍스트 입력
 composeTestRule
     .onNodeWithTag("email_input")
@@ -399,7 +399,7 @@ composeTestRule
 
 소프트 키보드의 IME 액션(완료, 검색, 다음 등)을 수행합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 키보드의 "검색" 버튼 누르기
 composeTestRule
     .onNodeWithTag("search_input")
@@ -431,7 +431,7 @@ composeTestRule
 
 노드가 화면에 표시되는지 확인합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 표시 확인
 composeTestRule
     .onNodeWithText("환영합니다")
@@ -447,7 +447,7 @@ composeTestRule
 
 노드가 시맨틱 트리에 **존재하는지** 확인합니다. `assertIsDisplayed`와 다르게, 화면에 보이지 않더라도 트리에 있으면 통과합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 트리에 존재 확인 (보이지 않아도 OK)
 composeTestRule
     .onNodeWithTag("hidden_element")
@@ -463,7 +463,7 @@ composeTestRule
 
 노드가 클릭 가능한지 확인합니다.
 
-```kotlin
+```kotlin [compose-playground]
 composeTestRule
     .onNodeWithText("제출")
     .assertHasClickAction()
@@ -473,7 +473,7 @@ composeTestRule
 
 노드의 텍스트가 정확히 일치하는지 확인합니다.
 
-```kotlin
+```kotlin [compose-playground]
 composeTestRule
     .onNodeWithTag("greeting")
     .assertTextEquals("안녕하세요")
@@ -483,7 +483,7 @@ composeTestRule
 
 노드가 활성화/비활성화 상태인지 확인합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 입력 전: 버튼 비활성화
 composeTestRule
     .onNodeWithText("로그인")
@@ -524,7 +524,7 @@ composeTestRule
 
 `testTag`는 테스트에서 노드를 식별하기 위한 **테스트 전용 태그**입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LoginForm() {
     Column {
@@ -554,7 +554,7 @@ fun LoginForm() {
 
 ### 언제 testTag를 사용해야 할까?
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 변경 가능한 텍스트로 노드 찾기
 composeTestRule
     .onNodeWithText("3개의 알림이 있습니다")  // 숫자가 바뀌면 테스트 실패!
@@ -577,7 +577,7 @@ composeTestRule
 
 `semantics` 수정자를 사용하면 테스트에서 활용할 수 있는 **커스텀 시맨틱 정보**를 추가할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 
@@ -603,7 +603,7 @@ composeTestRule
 
 팀에서 일관된 네이밍 규칙을 정하면 유지보수가 쉬워집니다.
 
-```kotlin
+```kotlin [kotlin-playground]
 // 추천: 화면이름_요소타입_용도
 object TestTags {
     // 로그인 화면
@@ -632,7 +632,7 @@ object TestTags {
 
 ### Step 1: 프로덕션 코드 작성
 
-```kotlin
+```kotlin [compose-playground]
 // CounterScreen.kt
 @Composable
 fun CounterScreen() {
@@ -681,7 +681,7 @@ fun CounterScreen() {
 
 ### Step 2: 테스트 코드 작성
 
-```kotlin
+```kotlin [compose-playground]
 // CounterScreenTest.kt
 // 위치: app/src/androidTest/java/com/example/app/CounterScreenTest.kt
 

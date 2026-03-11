@@ -96,7 +96,7 @@ Compose가 제공하는 `animate*AsState` 함수들:
 
 ### 투명도 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun FadeExample() {
     var isVisible by remember { mutableStateOf(true) }
@@ -124,7 +124,7 @@ fun FadeExample() {
 
 ### 회전 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RotationExample() {
     var isRotated by remember { mutableStateOf(false) }
@@ -151,7 +151,7 @@ fun RotationExample() {
 
 애니메이션 값을 Modifier에 적용할 때는 반드시 **람다 기반 Modifier**를 사용하세요. 람다 버전은 Drawing 단계에서만 실행되어 리컴포지션을 건너뜁니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ Good - 애니메이션이 Draw 단계에서 실행, 리컴포지션 스킵
 Modifier.graphicsLayer { alpha = animatedAlpha }
 
@@ -161,7 +161,7 @@ Modifier.alpha(animatedAlpha)
 
 색상 애니메이션의 경우 `Modifier.drawBehind { }`가 `Modifier.background()`보다 효율적입니다:
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ Good - Draw 단계에서만 실행
 Modifier.drawBehind { drawRect(color = animatedColor) }
 
@@ -177,7 +177,7 @@ Modifier.background(animatedColor)
 
 ### 버튼 색상 변경
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColorChangeButton() {
     var isSelected by remember { mutableStateOf(false) }
@@ -209,7 +209,7 @@ fun ColorChangeButton() {
 
 ### 카드 배경색 전환
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun StatusCard(isOnline: Boolean) {
     val cardColor by animateColorAsState(
@@ -239,7 +239,7 @@ fun StatusCard(isOnline: Boolean) {
 
 ### 크기 변경 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SizeAnimationExample() {
     var isExpanded by remember { mutableStateOf(false) }
@@ -263,7 +263,7 @@ fun SizeAnimationExample() {
 
 ### 패딩 변경 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun PaddingAnimationExample() {
     var isIndented by remember { mutableStateOf(false) }
@@ -289,7 +289,7 @@ fun PaddingAnimationExample() {
 
 정수 값을 애니메이션합니다. 카운터, 진행률 숫자 등에 활용할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AnimatedCounter() {
     var targetCount by remember { mutableIntStateOf(0) }
@@ -330,7 +330,7 @@ fun AnimatedCounter() {
 
 ### 펼치기/접기 카드
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ExpandableCard() {
     var isExpanded by remember { mutableStateOf(false) }
@@ -416,7 +416,7 @@ AnimationSpec<T>
 
 사용 방법은 간단합니다. `animate*AsState`의 `animationSpec` 매개변수에 전달하면 됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 val alpha by animateFloatAsState(
     targetValue = if (isVisible) 1f else 0f,
     animationSpec = tween(durationMillis = 500),  // 500ms 동안 전환
@@ -469,7 +469,7 @@ VeryLow   ─────→ 아주 느리게 도달 (부드러운 용수철)
 
 ### 코드 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SpringExamples() {
     var isActive by remember { mutableStateOf(false) }
@@ -590,7 +590,7 @@ EaseInOutCubic (느리게 시작, 느리게 끝)
 
 ### 코드 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TweenExample() {
     var isExpanded by remember { mutableStateOf(false) }
@@ -636,7 +636,7 @@ fun TweenExample() {
 
 `keyframes`를 사용하면 특정 시간에 특정 값을 지정할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun KeyframesExample() {
     var isBig by remember { mutableStateOf(false) }
@@ -677,7 +677,7 @@ keyframes 시각화 (시간 → 크기)
 
 ### repeatable: 유한 반복
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RepeatableExample() {
     var isShaking by remember { mutableStateOf(false) }
@@ -708,7 +708,7 @@ fun RepeatableExample() {
 
 ### snap: 즉시 전환
 
-```kotlin
+```kotlin [compose-playground]
 val alpha by animateFloatAsState(
     targetValue = if (isVisible) 1f else 0f,
     animationSpec = snap(delayMillis = 200),  // 200ms 후 즉시 전환

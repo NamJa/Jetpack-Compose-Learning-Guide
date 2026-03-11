@@ -25,7 +25,7 @@
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 
@@ -60,7 +60,7 @@ fun SimpleImageExample() {
 
 ### 다양한 리소스 이미지 로드
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ResourceImageExamples() {
     Column(
@@ -91,7 +91,7 @@ fun ResourceImageExamples() {
 
 이미지에 크기를 지정하지 않으면 원본 크기 그대로 표시됩니다. `Modifier`로 적절한 크기를 지정하세요.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SizedImageExample() {
     Image(
@@ -125,7 +125,7 @@ fun SizedImageExample() {
 
 ### 시각적 비교 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ContentScaleComparison() {
     val scales = listOf(
@@ -175,7 +175,7 @@ fun ContentScaleComparison() {
 
 ### 원형 이미지
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CircularImageExample() {
     Image(
@@ -191,7 +191,7 @@ fun CircularImageExample() {
 
 ### 둥근 모서리 이미지
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RoundedImageExample() {
     Image(
@@ -207,7 +207,7 @@ fun RoundedImageExample() {
 
 ### 다양한 Shape 활용
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun VariousShapesExample() {
     Row(
@@ -249,7 +249,7 @@ fun VariousShapesExample() {
 
 ### 테두리가 있는 원형 이미지
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BorderedCircularImage() {
     Image(
@@ -284,7 +284,7 @@ fun BorderedCircularImage() {
 | 일반적인 소스 | Material Symbols XML, VectorDrawable | PNG, JPG, WebP |
 | 접근성 | `contentDescription` | `contentDescription` |
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun IconVsImageExample() {
     Row(
@@ -320,7 +320,7 @@ fun IconVsImageExample() {
 
 ### Coil 의존성 추가
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts (app 모듈)
 dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
@@ -330,7 +330,7 @@ dependencies {
 
 ### 기본 AsyncImage 사용법
 
-```kotlin
+```kotlin [compose-playground]
 import coil3.compose.AsyncImage
 
 @Composable
@@ -360,7 +360,7 @@ fun NetworkImageExample() {
 
 ### 로딩 상태와 에러 처리
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AsyncImageWithStates() {
     AsyncImage(
@@ -378,7 +378,7 @@ fun AsyncImageWithStates() {
 
 ### SubcomposeAsyncImage로 커스텀 로딩 UI
 
-```kotlin
+```kotlin [compose-playground]
 import coil3.compose.SubcomposeAsyncImage
 
 @Composable
@@ -419,7 +419,7 @@ fun CustomLoadingImageExample() {
 
 ### ImageRequest로 세부 설정
 
-```kotlin
+```kotlin [compose-playground]
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 
@@ -452,7 +452,7 @@ Compose에서 이미지를 다루는 두 가지 주요 형식입니다.
 
 픽셀 기반 래스터 이미지입니다. PNG, JPG, WebP 등의 파일 형식에 해당합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ImageBitmapExample() {
     // 리소스에서 ImageBitmap 로드
@@ -469,7 +469,7 @@ fun ImageBitmapExample() {
 
 벡터 기반 이미지입니다. 확대/축소해도 품질이 유지됩니다. Android의 VectorDrawable(XML)에 해당합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ImageVectorExample() {
     // Material Icon (이미 ImageVector)
@@ -507,7 +507,7 @@ fun ImageVectorExample() {
 
 ### Canvas 기초
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BasicCanvasExample() {
     Canvas(
@@ -555,7 +555,7 @@ fun BasicCanvasExample() {
 
 ### 커스텀 프로그레스바 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CustomProgressBar(
     progress: Float, // 0.0 ~ 1.0
@@ -599,7 +599,7 @@ fun ProgressBarUsage() {
 
 ### 간단한 원형 차트 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SimplePieChart(
     data: List<Pair<Float, Color>>, // (비율, 색상) 리스트
@@ -661,7 +661,7 @@ fun PieChartUsage() {
 
 장식용 이미지가 아닌 한, 반드시 `contentDescription`을 제공하세요.
 
-```kotlin
+```kotlin [compose-playground]
 // 의미 있는 이미지: 설명 필수
 Image(
     painter = painterResource(id = R.drawable.product),
@@ -679,7 +679,7 @@ Image(
 
 크기를 지정하지 않으면 이미지 원본 크기로 표시되어 화면을 벗어날 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 잘못된 예: 크기 미지정
 Image(
     painter = painterResource(id = R.drawable.large_photo),
@@ -700,7 +700,7 @@ Image(
 
 ### 3) clip과 border 순서
 
-```kotlin
+```kotlin [compose-playground]
 // 올바른 순서: clip -> border
 Image(
     painter = painterResource(id = R.drawable.profile),
@@ -716,7 +716,7 @@ Image(
 
 네트워크에서 이미지를 로드할 때는 반드시 로딩 중과 에러 상태의 대체 UI를 제공하세요.
 
-```kotlin
+```kotlin [compose-playground]
 // 좋은 예: placeholder와 error 모두 제공
 AsyncImage(
     model = imageUrl,

@@ -29,7 +29,7 @@
 
 데이터가 적을 때(수십 개 이하) 사용합니다. **모든 항목을 한 번에 렌더링**합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BasicListExample() {
     val items = listOf("사과", "바나나", "체리", "포도", "키위")
@@ -53,7 +53,7 @@ fun BasicListExample() {
 
 데이터가 많을 때 사용합니다. **화면에 보이는 항목만 렌더링**하여 메모리와 성능을 최적화합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LazyListExample() {
     val items = List(1000) { "항목 #$it" }
@@ -89,7 +89,7 @@ fun LazyListExample() {
 
 ### 기본 구조
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SimpleLazyColumn() {
     LazyColumn {
@@ -131,7 +131,7 @@ fun SimpleLazyColumn() {
 
 ### item: 단일 항목
 
-```kotlin
+```kotlin [compose-playground]
 LazyColumn {
     item {
         Text("이것은 하나의 항목입니다")
@@ -141,7 +141,7 @@ LazyColumn {
 
 ### items: 컬렉션 기반 항목
 
-```kotlin
+```kotlin [compose-playground]
 val fruits = listOf("사과", "바나나", "체리")
 
 LazyColumn {
@@ -159,7 +159,7 @@ LazyColumn {
 
 ### itemsIndexed: 인덱스와 함께
 
-```kotlin
+```kotlin [compose-playground]
 val fruits = listOf("사과", "바나나", "체리")
 
 LazyColumn {
@@ -198,7 +198,7 @@ LazyColumn {
 
 `contentPadding`은 리스트 콘텐츠 주위에 패딩을 추가합니다. `Modifier.padding()`과 달리 스크롤 영역에는 영향을 주지 않습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun PaddedLazyColumn() {
     LazyColumn(
@@ -227,7 +227,7 @@ fun PaddedLazyColumn() {
 
 ### verticalArrangement로 항목 간격
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SpacedLazyColumn() {
     LazyColumn(
@@ -254,7 +254,7 @@ fun SpacedLazyColumn() {
 
 `LazyRow`는 `LazyColumn`의 가로 버전입니다. 가로로 스크롤하는 리스트를 만듭니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun HorizontalListExample() {
     LazyRow(
@@ -279,7 +279,7 @@ fun HorizontalListExample() {
 
 ### 실무 예: 카테고리 칩 리스트
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CategoryChipRow() {
     val categories = listOf("전체", "음식", "여행", "기술", "스포츠", "음악", "영화", "패션")
@@ -318,7 +318,7 @@ fun CategoryChipRow() {
 
 ### key가 없을 때의 문제
 
-```kotlin
+```kotlin [compose-playground]
 // 잘못된 예: key 없음
 LazyColumn {
     items(todoList) { todo ->
@@ -330,7 +330,7 @@ LazyColumn {
 
 ### key 사용
 
-```kotlin
+```kotlin [compose-playground]
 // 올바른 예: 고유한 key 제공
 LazyColumn {
     items(
@@ -353,7 +353,7 @@ LazyColumn {
 
 ### 실전 예제
 
-```kotlin
+```kotlin [compose-playground]
 data class Contact(
     val id: String,
     val name: String,
@@ -406,7 +406,7 @@ fun ContactItem(contact: Contact) {
 
 `stickyHeader`는 스크롤 시 섹션 헤더가 화면 상단에 고정되는 기능입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StickyHeaderExample() {
@@ -454,7 +454,7 @@ fun StickyHeaderExample() {
 
 `animateItem()`을 사용하면 항목이 추가, 삭제, 재정렬될 때 부드러운 애니메이션이 적용됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AnimatedListExample() {
     var items by remember { mutableStateOf(List(5) { "항목 $it" }) }
@@ -520,7 +520,7 @@ fun AnimatedListExample() {
 
 ### GridCells.Fixed: 고정 열 수
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun FixedGridExample() {
     LazyVerticalGrid(
@@ -549,7 +549,7 @@ fun FixedGridExample() {
 
 ### GridCells.Adaptive: 반응형 열 수
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AdaptiveGridExample() {
     LazyVerticalGrid(
@@ -599,7 +599,7 @@ fun AdaptiveGridExample() {
 
 ### 실전 예: 상품 그리드
 
-```kotlin
+```kotlin [compose-playground]
 data class Product(
     val id: Int,
     val name: String,
@@ -661,7 +661,7 @@ fun ProductCard(product: Product) {
 
 `LazyVerticalStaggeredGrid`는 각 항목의 높이가 다른 엇갈린(staggered) 그리드를 만듭니다. Pinterest, 갤러리 앱에서 자주 볼 수 있는 레이아웃입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StaggeredGridExample() {
@@ -712,7 +712,7 @@ fun StaggeredGridExample() {
 
 ### rememberLazyListState
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollControlExample() {
     val listState = rememberLazyListState()
@@ -758,7 +758,7 @@ fun ScrollControlExample() {
 
 ### 스크롤 위치에 따른 UI 변경
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollAwareExample() {
     val listState = rememberLazyListState()
@@ -819,7 +819,7 @@ fun ScrollAwareExample() {
 
 항목의 크기가 0이면 LazyColumn이 무한히 항목을 만들려고 시도할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 잘못된 예: 높이가 0인 항목
 LazyColumn {
     items(1000) { index ->
@@ -842,7 +842,7 @@ LazyColumn {
 
 `LazyColumn` 안에 `LazyColumn`을 넣거나, 스크롤 가능한 `Column`을 넣으면 안 됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 잘못된 예: LazyColumn 안에 LazyColumn
 LazyColumn {
     item {
@@ -874,7 +874,7 @@ LazyColumn {
 
 서로 다른 타입의 항목이 섞여 있을 때 `contentType`을 제공하면 Compose가 뷰를 더 효율적으로 재사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 LazyColumn {
     item(contentType = "header") {
         Text(
@@ -899,7 +899,7 @@ LazyColumn {
 
 ### 4) 무거운 작업을 항목 컴포지션에서 하지 않기
 
-```kotlin
+```kotlin [compose-playground]
 // 잘못된 예: 매 항목마다 무거운 계산
 items(products) { product ->
     val formattedPrice = NumberFormat.getCurrencyInstance().format(product.price) // 매번 생성
@@ -923,7 +923,7 @@ items(products) { product ->
 
 ### 의존성 추가
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.x.x")
@@ -933,7 +933,7 @@ dependencies {
 
 ### 기본 구조
 
-```kotlin
+```kotlin [compose-playground]
 // 1. PagingSource 정의
 class ArticlePagingSource(
     private val api: ArticleApi

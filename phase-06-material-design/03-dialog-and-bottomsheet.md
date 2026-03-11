@@ -24,7 +24,7 @@
 
 `AlertDialog`는 가장 기본적인 대화상자입니다. 사용자에게 확인/취소를 묻거나, 중요한 정보를 알릴 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 
@@ -66,7 +66,7 @@ fun DeleteConfirmDialog(
 
 ### 상태로 대화상자 표시/숨기기
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun HomeScreen() {
     var showDialog by remember { mutableStateOf(false) }
@@ -100,7 +100,7 @@ fun HomeScreen() {
 
 `AlertDialog`의 레이아웃이 맞지 않을 때는 `Dialog` 컴포저블을 사용하여 **완전히 자유로운 레이아웃**을 구성할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.ui.window.Dialog
 
 @Composable
@@ -180,7 +180,7 @@ fun ProfileEditDialog(
 
 ### DatePickerDialog
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.rememberDatePickerState
@@ -248,7 +248,7 @@ fun DateSelectionScreen() {
 
 Material3 **1.4.0**부터 `TimePickerDialog`가 공식적으로 추가되어, `TimePicker`와 `TimeInput` 모두를 하나의 다이얼로그에서 지원합니다. 더 이상 커스텀 Dialog를 직접 구성할 필요가 없습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTimePickerDialog(
@@ -294,7 +294,7 @@ fun MyTimePickerDialog(
 <details>
 <summary>이전 방식: 커스텀 Dialog로 TimePicker 구성 (접기/펼치기)</summary>
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTimePickerDialogLegacy(
@@ -358,7 +358,7 @@ fun MyTimePickerDialogLegacy(
 
 `ModalBottomSheet`는 화면 하단에서 올라오는 시트입니다. 추가 옵션, 필터, 상세 정보를 표시할 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -421,7 +421,7 @@ fun BottomSheetExample() {
 
 ### 프로그래밍 방식으로 시트 닫기
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgrammaticDismissExample() {
@@ -459,7 +459,7 @@ fun ProgrammaticDismissExample() {
 
 `BottomSheetScaffold`는 화면에 **항상 일부가 보이는(peekable)** 하단 시트를 제공합니다. 지도 앱에서 하단에 장소 정보가 살짝 보이는 UI에 적합합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -533,7 +533,7 @@ fun BottomSheetScaffoldExample() {
 
 ### DropdownMenu — 컨텍스트 메뉴
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 
@@ -592,7 +592,7 @@ fun ContextMenuExample() {
 
 ### ExposedDropdownMenuBox — 선택 드롭다운
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -649,7 +649,7 @@ fun CitySelector() {
 
 ### AssistChip — 도움/바로가기
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.AssistChip
 
 @Composable
@@ -670,7 +670,7 @@ fun AssistChipExample() {
 
 ### FilterChip — 필터 선택
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.FilterChip
 
 @Composable
@@ -712,7 +712,7 @@ fun FilterChipGroup() {
 
 ### InputChip — 입력 값 표시 (삭제 가능)
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 
@@ -747,7 +747,7 @@ fun TagInput() {
 
 ### SuggestionChip — 추천/제안
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.SuggestionChip
 
 @Composable
@@ -785,7 +785,7 @@ fun SuggestionChipExample() {
 
 Material3 1.4.0부터 Chip 컴포넌트에 `horizontalArrangement`와 `contentPadding` 파라미터가 추가되어, 내부 콘텐츠의 배치와 여백을 더 세밀하게 제어할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 FilterChip(
     selected = true,
     onClick = { /* ... */ },
@@ -813,7 +813,7 @@ Material3 1.4.0에서 `SearchBar`가 리디자인되었습니다. 새로운 `Sea
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchExample() {
@@ -840,7 +840,7 @@ fun SearchExample() {
 
 ### ExpandedFullScreenSearchBar — 전체 화면 검색
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullScreenSearchExample() {
@@ -871,7 +871,7 @@ fun FullScreenSearchExample() {
 
 Material3 1.4.0에서 비밀번호 입력에 특화된 `SecureTextField`와 `OutlinedSecureTextField`가 추가되었습니다. 기존에 `visualTransformation = PasswordVisualTransformation()`을 직접 설정하던 방식보다 간편합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.OutlinedSecureTextField
 

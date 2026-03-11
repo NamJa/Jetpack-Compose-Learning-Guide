@@ -59,7 +59,7 @@
 
 ### 실제 코드로 이해하기
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ToggleMessage() {
     var showMessage by remember { mutableStateOf(true) }
@@ -113,7 +113,7 @@ fun MessageCard(text: String) {
 
 리컴포지션의 트리거는 단 하나입니다: **State 객체의 값 변경**.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun Counter() {
     // State 선언 — Compose가 이 값을 "관찰"합니다
@@ -160,7 +160,7 @@ fun Counter() {
 
 ### State가 아닌 일반 변수는 리컴포지션을 트리거하지 않는다
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BrokenCounter() {
     // ❌ 일반 변수 — Compose가 관찰하지 않음!
@@ -207,7 +207,7 @@ fun WorkingCounter() {
 
 Compose는 **전체 UI를 다시 그리지 않습니다.** 변경된 State를 읽는 Composable만 다시 실행합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SmartRecompositionDemo() {
     var count by remember { mutableStateOf(0) }
@@ -270,7 +270,7 @@ Strong Skipping Mode에서는 모든 매개변수가 **이전 값과 동일**하
 - **안정적(Stable) 타입**: `equals()`로 비교합니다
 - **불안정(Unstable) 타입**: 인스턴스 동일성(===)으로 비교합니다
 
-```kotlin
+```kotlin [compose-playground]
 // 안정적인 타입 (자동으로 Stable로 판단)
 // - 기본 타입: Int, String, Float, Boolean 등
 // - 불변 컬렉션: List (읽기 전용), Set, Map
@@ -299,7 +299,7 @@ data class MutableUser(    // ⚠ Unstable — var 프로퍼티 포함
 
 Compose는 **코드상의 호출 위치(Call Site)** 로 각 컴포저블 인스턴스를 식별합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TwoGreetings() {
     // 같은 함수를 두 번 호출하지만, 호출 사이트가 다르므로
@@ -326,7 +326,7 @@ fun TwoGreetings() {
 
 ### 조건문에서의 호출 사이트
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ConditionalGreeting(showFirst: Boolean) {
     Column {
@@ -344,7 +344,7 @@ fun ConditionalGreeting(showFirst: Boolean) {
 
 ### 반복문에서의 문제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun NameList(names: List<String>) {
     Column {
@@ -383,7 +383,7 @@ names = ["Alice", "Bob", "Charlie"]일 때:
 
 ### key 없이 리스트 렌더링 (비효율적)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TodoList(todos: List<Todo>) {
     Column {
@@ -397,7 +397,7 @@ fun TodoList(todos: List<Todo>) {
 
 ### key를 사용한 리스트 렌더링 (효율적)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TodoList(todos: List<Todo>) {
     Column {
@@ -446,7 +446,7 @@ data class Todo(
 
 `LazyColumn`에서는 `items` 함수의 `key` 매개변수를 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TodoLazyList(todos: List<Todo>) {
     LazyColumn {
@@ -474,7 +474,7 @@ fun TodoLazyList(todos: List<Todo>) {
 Compose는 리컴포지션이 **완료되기 전에 상태가 또 변경**되면,
 현재 진행 중인 리컴포지션을 **취소하고 새로운 상태로 다시 시작**합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RapidCounter() {
     var count by remember { mutableStateOf(0) }
@@ -499,7 +499,7 @@ fun RapidCounter() {
 
 Compose는 성능 최적화를 위해 여러 리컴포지션을 **병렬로 실행**할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ParallelRecomposition() {
     var stateA by remember { mutableStateOf(0) }
@@ -519,7 +519,7 @@ fun ParallelRecomposition() {
 
 ### 특성 3: 실행 순서가 보장되지 않는다
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun UnorderedExecution() {
     // ⚠ Compose는 이 세 Composable을 어떤 순서로든 실행할 수 있습니다
@@ -549,7 +549,7 @@ fun UnorderedExecution() {
 
 ### 잘못된 예: Composable 안에서 부수 효과
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 위험한 코드 — 절대 이렇게 하지 마세요!
 
 var globalCounter = 0  // 공유 변수
@@ -594,7 +594,7 @@ fun BadCounter() {
 
 ### 올바른 예: Side Effect API 사용
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ 올바른 코드 — Side Effect API를 사용하세요
 
 @Composable

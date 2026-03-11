@@ -38,7 +38,7 @@
 
 ### 왜 통제된 환경이 필요할까?
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 컴포저블 본문에서 직접 부수 효과 실행
 @Composable
 fun DangerousComposable(viewModel: MyViewModel) {
@@ -59,7 +59,7 @@ fun DangerousComposable(viewModel: MyViewModel) {
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SnackbarDemo(
     message: String?,
@@ -76,7 +76,7 @@ fun SnackbarDemo(
 
 ### LaunchedEffect의 키(Key) 동작
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TimerScreen(userId: String) {
     var elapsedTime by remember { mutableStateOf(0) }
@@ -96,7 +96,7 @@ fun TimerScreen(userId: String) {
 
 ### 키가 Unit 또는 true인 경우
 
-```kotlin
+```kotlin [compose-playground]
 // 컴포저블이 컴포지션에 있는 동안 단 한 번만 실행
 LaunchedEffect(Unit) {
     // 초기화 작업 (한 번만)
@@ -106,7 +106,7 @@ LaunchedEffect(Unit) {
 
 ### LaunchedEffect에서 suspend 함수 호출
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun DataScreen(viewModel: DataViewModel) {
     val scrollState = rememberLazyListState()
@@ -134,7 +134,7 @@ fun DataScreen(viewModel: DataViewModel) {
 
 ### LaunchedEffect vs rememberCoroutineScope
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ LaunchedEffect는 이벤트 핸들러에서 사용할 수 없다
 @Composable
 fun WrongUsage() {
@@ -162,7 +162,7 @@ fun CorrectUsage(snackbarHostState: SnackbarHostState) {
 
 ### 실전 예제: Scaffold + 스낵바
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScaffoldWithSnackbar() {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -199,7 +199,7 @@ fun ScaffoldWithSnackbar() {
 
 ### 문제 상황
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: onTimeout이 변경되어도 이전 값을 캡처한 상태로 유지
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
@@ -212,7 +212,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
 
 ### 해결: rememberUpdatedState
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ 올바른 예: 항상 최신 onTimeout을 참조
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
@@ -243,7 +243,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
 
 ### 기본 구조
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LifecycleObserverDemo(lifecycleOwner: LifecycleOwner) {
     DisposableEffect(lifecycleOwner) {
@@ -267,7 +267,7 @@ fun LifecycleObserverDemo(lifecycleOwner: LifecycleOwner) {
 
 ### 실전 예제: 시스템 브로드캐스트 수신기
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun NetworkStatusListener(
     context: Context = LocalContext.current,
@@ -302,7 +302,7 @@ fun NetworkStatusListener(
 
 ### onDispose를 잊으면?
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 컴파일 에러: DisposableEffect는 반드시 onDispose를 포함해야 함
 DisposableEffect(Unit) {
     // onDispose { } 없으면 컴파일 에러
@@ -323,7 +323,7 @@ DisposableEffect(Unit) {
 
 `SideEffect`는 **리컴포지션이 성공적으로 완료될 때마다** 실행됩니다. Compose 상태를 Compose가 관리하지 않는 객체와 공유할 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AnalyticsScreen(
     screenName: String,
@@ -345,7 +345,7 @@ fun AnalyticsScreen(
 - **모든 리컴포지션마다** 실행됨
 - 리컴포지션이 **실패(취소)되면 실행되지 않음** → 일관성 보장
 
-```kotlin
+```kotlin [compose-playground]
 // SideEffect vs LaunchedEffect 차이
 @Composable
 fun Comparison() {
@@ -371,7 +371,7 @@ fun Comparison() {
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun UserProfile(userId: String, repository: UserRepository) {
     val userState by produceState<Result<User>>(
@@ -397,7 +397,7 @@ fun UserProfile(userId: String, repository: UserRepository) {
 
 ### Flow를 produceState로 변환
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LocationTracker(locationProvider: LocationProvider) {
     val location by produceState<Location?>(initialValue = null) {
@@ -422,7 +422,7 @@ fun LocationTracker(locationProvider: LocationProvider) {
 
 ### 올바른 사용: 상태에서 파생된 값
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TodoList() {
     val todoItems = remember { mutableStateListOf<TodoItem>() }
@@ -447,7 +447,7 @@ fun TodoList() {
 
 ### 올바른 사용: 스크롤 위치 기반 UI 변경
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollToTopButton() {
     val listState = rememberLazyListState()
@@ -479,7 +479,7 @@ fun ScrollToTopButton() {
 
 ### 잘못된 사용: derivedStateOf가 필요 없는 경우
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 단순 변환에 derivedStateOf 사용 (불필요한 오버헤드)
 @Composable
 fun Greeting(name: String) {
@@ -513,7 +513,7 @@ fun Greeting(name: String) {
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollPositionLogger(listState: LazyListState) {
     LaunchedEffect(listState) {
@@ -528,7 +528,7 @@ fun ScrollPositionLogger(listState: LazyListState) {
 
 ### 실전 예제: 무한 스크롤 (페이지네이션)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun InfiniteScrollList(
     items: List<String>,
@@ -561,7 +561,7 @@ fun InfiniteScrollList(
 
 ### 실전 예제: 검색 debounce
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SearchScreen(onSearch: (String) -> Unit) {
     var query by remember { mutableStateOf("") }
@@ -627,7 +627,7 @@ fun SearchScreen(onSearch: (String) -> Unit) {
 
 Compose BOM 2026.02.01에서 추가된 `Modifier.onVisibilityChanged()`를 사용하면, 컴포저블의 화면 가시성 변화를 추적하기 위해 `LaunchedEffect`를 사용하던 패턴을 더 간결하게 대체할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 기존 방식: LaunchedEffect + 수동 가시성 추적
 @Composable
 fun TrackVisibility(onVisible: () -> Unit) {
@@ -655,7 +655,7 @@ fun TrackVisibility(onVisible: () -> Unit) {
 
 ### 자주 하는 실수
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 실수 1: 이벤트 핸들러에서 LaunchedEffect 사용 시도
 @Composable
 fun WrongEventHandler() {
@@ -683,7 +683,7 @@ fun CorrectEventHandler(onNavigate: () -> Unit) {
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 실수 2: DisposableEffect에서 onDispose 누락
 // → 컴파일 에러 발생 (Compose가 강제함)
 

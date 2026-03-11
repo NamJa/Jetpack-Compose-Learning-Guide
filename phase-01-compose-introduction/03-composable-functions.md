@@ -25,7 +25,7 @@
 
 `@Composable`은 "이 함수는 UI를 구성하는 함수입니다"라고 Compose 컴파일러에게 알려주는 어노테이션입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun Greeting(name: String) {
     Text(text = "안녕하세요, $name!")
@@ -36,7 +36,7 @@ fun Greeting(name: String) {
 
 ### 일반 함수와의 차이
 
-```kotlin
+```kotlin [compose-playground]
 // 일반 Kotlin 함수 — 값을 계산하고 반환
 fun add(a: Int, b: Int): Int {
     return a + b
@@ -67,7 +67,7 @@ fun NumberDisplay(value: Int) {
 
 ### 호출 규칙
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ParentComposable() {
     // ✅ Composable 안에서 Composable 호출 — OK
@@ -94,7 +94,7 @@ Composable 함수에는 세 가지 핵심 특성이 있습니다.
 
 Composable 함수는 값을 반환하지 않습니다. 대신 UI를 **방출(emit)** 합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 생각: UI를 반환한다
 // fun makeText(): Text { ... }
 
@@ -128,7 +128,7 @@ fun DisplayMessage(message: String) {  // 반환 타입: Unit (생략됨)
 
 같은 입력(매개변수)으로 호출하면 항상 **같은 UI**를 생성해야 합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ 멱등성 보장 — 같은 name이면 항상 같은 UI
 @Composable
 fun Greeting(name: String) {
@@ -150,7 +150,7 @@ fun RandomGreeting(name: String) {
 
 Composable 함수 안에서 UI 방출 외의 작업(부수 효과)을 해서는 안 됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 부수 효과 — Composable 안에서 하면 안 되는 것들
 @Composable
 fun BadExample() {
@@ -190,7 +190,7 @@ fun GoodExample(data: String) {
 
 ### 첫 번째 Composable: Greeting
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun Greeting(name: String) {
     Text(
@@ -203,7 +203,7 @@ fun Greeting(name: String) {
 
 **사용 방법:**
 
-```kotlin
+```kotlin [compose-playground]
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,7 +219,7 @@ class MainActivity : ComponentActivity() {
 Composable의 진짜 힘은 **조합(Composition)** 에 있습니다.
 작은 Composable을 레고 블록처럼 조합해서 복잡한 UI를 만듭니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ProfileImage(imageUrl: String) {
     // 프로필 이미지 표시
@@ -296,7 +296,7 @@ fun UserProfileCard(name: String, bio: String) {
 
 ### 기본 매개변수
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun WelcomeMessage(
     userName: String,          // 필수 매개변수
@@ -320,7 +320,7 @@ fun App() {
 
 Compose에서는 **Modifier를 매개변수로 받는 것**이 표준 패턴입니다.
 
-```kotlin
+```kotlin [compose-playground]
 // ✅ Compose 컨벤션: modifier 매개변수를 첫 번째 선택적 매개변수로 배치
 @Composable
 fun CustomCard(
@@ -355,7 +355,7 @@ fun App() {
 
 ### 이벤트 핸들러 전달 (람다 매개변수)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CounterButton(
     count: Int,
@@ -382,7 +382,7 @@ fun CounterScreen() {
 
 Compose에서는 **다른 Composable을 매개변수로** 받을 수도 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SimpleCard(
     modifier: Modifier = Modifier,
@@ -438,7 +438,7 @@ Compose의 큰 장점 중 하나는 **Kotlin의 제어 구문을 그대로 UI에
 
 ### 조건문 (if / when)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LoginScreen(isLoggedIn: Boolean, userName: String) {
     Column(
@@ -464,7 +464,7 @@ fun LoginScreen(isLoggedIn: Boolean, userName: String) {
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // when 표현식 활용
 @Composable
 fun StatusIndicator(status: Status) {
@@ -500,7 +500,7 @@ enum class Status { LOADING, SUCCESS, ERROR }
 </LinearLayout>
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // XML 방식의 Kotlin 코드
 if (isLoggedIn) {
     welcomeText.visibility = View.VISIBLE
@@ -522,7 +522,7 @@ if (isLoggedIn) {
 
 ### 반복문 (for)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun FruitList(fruits: List<String>) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -559,7 +559,7 @@ fun App() {
 
 ### 인덱스와 함께 반복
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun NumberedList(items: List<String>) {
     Column {
@@ -584,7 +584,7 @@ fun NumberedList(items: List<String>) {
 
 ### 기본 미리보기 작성법
 
-```kotlin
+```kotlin [compose-playground]
 // 1. 미리보기 전용 Composable 함수를 만든다
 // 2. @Preview와 @Composable을 모두 붙인다
 // 3. 함수 안에서 확인하고 싶은 Composable을 호출한다
@@ -601,7 +601,7 @@ fun GreetingPreview() {
 
 ### 다양한 상태를 미리보기
 
-```kotlin
+```kotlin [compose-playground]
 @Preview(name = "로그인 상태", showBackground = true)
 @Composable
 fun LoginScreenLoggedInPreview() {
@@ -634,7 +634,7 @@ fun LoginScreenLoggedOutPreview() {
 
 ### Preview 전용 데이터 제공
 
-```kotlin
+```kotlin [compose-playground]
 // 미리보기용 샘플 데이터
 @Preview(showBackground = true)
 @Composable
@@ -657,7 +657,7 @@ fun FruitListPreview() {
 
 ### Preview 함수 네이밍 컨벤션
 
-```kotlin
+```kotlin [compose-playground]
 // 컨벤션: [Composable이름] + Preview
 // 여러 상태가 있으면 상태를 뒤에 추가
 

@@ -54,7 +54,7 @@ Column (세로)       Row (가로)         Box (겹침)
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnExample() {
     Column {
@@ -77,7 +77,7 @@ fun ColumnExample() {
 
 ### Column에 Modifier 적용
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun StyledColumn() {
     Column(
@@ -110,7 +110,7 @@ fun StyledColumn() {
 
 ### Column의 주요 매개변수
 
-```kotlin
+```kotlin [compose-playground]
 Column(
     modifier = Modifier,                              // 수정자
     verticalArrangement = Arrangement.Top,             // 세로 방향 배치 방식
@@ -129,7 +129,7 @@ Column(
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowExample() {
     Row {
@@ -150,7 +150,7 @@ fun RowExample() {
 
 ### Row에 Modifier 적용
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun StyledRow() {
     Row(
@@ -178,7 +178,7 @@ fun StyledRow() {
 
 ### Row의 주요 매개변수
 
-```kotlin
+```kotlin [compose-playground]
 Row(
     modifier = Modifier,                                // 수정자
     horizontalArrangement = Arrangement.Start,           // 가로 방향 배치 방식
@@ -191,7 +191,7 @@ Row(
 
 `weight`는 Row(또는 Column) 안에서 **남은 공간을 비율로 나눌 때** 사용하는 범위 지정 수정자입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun WeightedRow() {
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -235,7 +235,7 @@ fun WeightedRow() {
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BoxExample() {
     Box(
@@ -284,7 +284,7 @@ fun BoxExample() {
 
 ### Box의 주요 매개변수
 
-```kotlin
+```kotlin [compose-playground]
 Box(
     modifier = Modifier,                                  // 수정자
     contentAlignment = Alignment.TopStart,                 // 자식 기본 정렬 위치
@@ -296,7 +296,7 @@ Box(
 
 Box 내부의 자식에서 `Modifier.align()`을 사용하면 **개별 자식의 위치**를 지정할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BoxAlignExample() {
     Box(
@@ -381,7 +381,7 @@ fun BoxAlignExample() {
 
 **Compose 방식:**
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ComposeEquivalent() {
     Column(
@@ -412,7 +412,7 @@ fun ComposeEquivalent() {
 
 ### Column 안에 Row
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnWithRows() {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -465,7 +465,7 @@ fun ColumnWithRows() {
 
 ### Row 안에 Column
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowWithColumns() {
     Row(
@@ -513,7 +513,7 @@ fun RowWithColumns() {
 
 ### 복잡한 중첩 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ComplexLayout() {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -582,7 +582,7 @@ fun ComplexLayout() {
 
 ### 고정 간격
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun FixedSpacerExample() {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -610,7 +610,7 @@ fun FixedSpacerExample() {
 
 ### Row에서의 Spacer
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowSpacerExample() {
     Row(
@@ -646,7 +646,7 @@ fun RowSpacerExample() {
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SurfaceExample() {
     Surface(
@@ -678,7 +678,7 @@ fun SurfaceExample() {
 
 ### Surface vs Box + Modifier
 
-```kotlin
+```kotlin [compose-playground]
 // Surface 사용 (권장)
 @Composable
 fun WithSurface() {
@@ -711,7 +711,7 @@ fun WithBoxModifier() {
 
 `Card`는 Surface의 특수한 형태로, **카드 UI 패턴**에 최적화되어 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CardExample() {
     Card(
@@ -736,7 +736,7 @@ fun CardExample() {
 
 지금까지 배운 Column, Row, Box, Spacer, Surface를 모두 활용하여 **프로필 카드**를 만들어 봅시다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ProfileCard(
     name: String,

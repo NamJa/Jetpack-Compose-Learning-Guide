@@ -22,7 +22,7 @@
 
 Type-Safe Navigation에서 인수를 전달하려면, **경로(Route) data class에 프로퍼티를 추가**하기만 하면 됩니다. Navigation 라이브러리가 자동으로 직렬화/역직렬화를 처리합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import kotlinx.serialization.Serializable
 
 // 인수 없는 경로
@@ -64,7 +64,7 @@ data class UserProfile(
 
 화면에서 전달받은 인수를 읽으려면, `composable<Route>` 블록에서 `backStackEntry.toRoute<T>()`를 호출합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.navigation.toRoute
 
 @Composable
@@ -125,7 +125,7 @@ Navigation으로 전달하는 데이터는 **가능한 한 최소화**해야 합
 - 딥 링크에서도 동일한 경로를 사용할 수 있음
 - 데이터의 단일 진실 공급원(Single Source of Truth) 유지
 
-```kotlin
+```kotlin [compose-playground]
 // 경로: ID만 정의
 @Serializable
 data class ProductDetail(val productId: Long)
@@ -181,7 +181,7 @@ fun ProductDetailScreen(
 
 ViewModel에서 Navigation 인수를 읽을 때는 `SavedStateHandle.toRoute<T>()`를 사용합니다. Navigation 라이브러리가 자동으로 경로 인수를 `SavedStateHandle`에 저장해주기 때문입니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
@@ -229,7 +229,7 @@ composable<Detail> {
 
 Type-Safe Navigation에서 딥 링크를 설정할 때, `navDeepLink<T>(basePath = ...)`를 사용하면 경로 클래스의 프로퍼티가 자동으로 URI 파라미터에 매핑됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.navigation.navDeepLink
 
 val uri = "https://www.myapp.com"
@@ -267,7 +267,7 @@ NavHost(
 
 ### 기본 전환 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 
@@ -300,7 +300,7 @@ NavHost(
 
 ### 슬라이드 전환 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 composable<Detail>(
     enterTransition = {
         slideInHorizontally(
@@ -334,7 +334,7 @@ composable<Detail>(
 
 ### NavHost 전체에 기본 애니메이션 설정
 
-```kotlin
+```kotlin [compose-playground]
 NavHost(
     navController = navController,
     startDestination = Home,
@@ -369,7 +369,7 @@ NavHost(
 
 ### 결과를 보내는 쪽 (B 화면)
 
-```kotlin
+```kotlin [compose-playground]
 @Serializable
 object FilterScreen
 
@@ -408,7 +408,7 @@ fun FilterScreen(
 
 ### 결과를 받는 쪽 (A 화면)
 
-```kotlin
+```kotlin [compose-playground]
 composable<Home> { backStackEntry ->
     // 이전 화면(B)이 savedStateHandle에 저장한 결과를 관찰
     val savedStateHandle = backStackEntry.savedStateHandle

@@ -24,7 +24,7 @@
 
 `Scaffold`는 Material Design의 **기본 화면 레이아웃 구조**를 제공합니다. 상단 바, 하단 바, FAB, 스낵바, 콘텐츠 영역을 올바른 위치에 자동으로 배치합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.Scaffold
 
 @Composable
@@ -74,7 +74,7 @@ fun MainScreen() {
 
 `TopAppBar`는 화면 상단에 제목, 내비게이션 아이콘(뒤로 가기), 액션 버튼을 배치합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 
@@ -125,7 +125,7 @@ fun MyTopAppBar(
 
 ### 스크롤 동작 연동
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScrollableScreen() {
@@ -168,7 +168,7 @@ M3은 용도에 따라 4가지 종류의 TopAppBar를 제공합니다.
 
 ### CenterAlignedTopAppBar — 제목 중앙 정렬
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CenteredAppBar() {
@@ -190,7 +190,7 @@ fun CenteredAppBar() {
 
 ### MediumTopAppBar — 두 줄 제목
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediumAppBarExample() {
@@ -223,7 +223,7 @@ fun MediumAppBarExample() {
 
 ### LargeTopAppBar — 큰 제목
 
-```kotlin
+```kotlin [compose-playground]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LargeAppBarExample() {
@@ -258,7 +258,7 @@ fun LargeAppBarExample() {
 
 `BottomAppBar`는 화면 하단에 액션 버튼들을 배치합니다. FAB과 함께 사용하는 것이 일반적입니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BottomAppBarExample() {
     Scaffold(
@@ -303,7 +303,7 @@ fun BottomAppBarExample() {
 
 `NavigationBar`는 화면 하단에 배치되는 **탭 내비게이션**입니다. 3~5개의 최상위 목적지를 전환할 때 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 
@@ -347,7 +347,7 @@ fun MyNavigationBar(
 
 ### Scaffold + NavigationBar + NavHost 통합 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -401,7 +401,7 @@ fun MainScreen() {
 
 `NavigationRail`은 화면 **왼쪽에 세로로 배치**되는 내비게이션입니다. 태블릿이나 넓은 화면에서 `NavigationBar` 대신 사용합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 
@@ -446,7 +446,7 @@ fun MyNavigationRail(
 
 ### 화면 크기에 따라 NavigationBar/Rail 전환
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AdaptiveNavigation() {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -474,7 +474,7 @@ fun AdaptiveNavigation() {
 
 **FAB(Floating Action Button)** 은 화면에서 가장 중요한 하나의 액션을 나타냅니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.LargeFloatingActionButton
@@ -525,7 +525,7 @@ fun ExtendedFabExample() {
 
 ### 스크롤에 따라 FAB 확장/축소
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollAwareFab() {
     val listState = rememberLazyListState()
@@ -560,7 +560,7 @@ fun ScrollAwareFab() {
 
 `Snackbar`는 화면 하단에 잠시 나타나는 **알림 메시지**입니다. 사용자에게 피드백을 제공하거나, 되돌리기(Undo) 같은 간단한 액션을 제공합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import kotlinx.coroutines.launch
@@ -617,7 +617,7 @@ fun SnackbarExample() {
 
 ### ViewModel에서 스낵바 트리거
 
-```kotlin
+```kotlin [compose-playground]
 // ViewModel
 class ItemViewModel : ViewModel() {
     private val _snackbarMessage = MutableSharedFlow<String>()
@@ -666,7 +666,7 @@ implementation("androidx.compose.material3:material3-adaptive-navigation-suite:<
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 
@@ -704,7 +704,7 @@ fun AdaptiveApp() {
 
 ### 색상 커스터마이징
 
-```kotlin
+```kotlin [compose-playground]
 NavigationSuiteScaffold(
     navigationSuiteItems = { /* ... */ },
     navigationSuiteColors = NavigationSuiteDefaults.colors(
@@ -723,7 +723,7 @@ NavigationSuiteScaffold(
 
 자동 선택 대신, 특정 내비게이션 타입을 강제로 지정할 수도 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 NavigationSuiteScaffold(
     layoutType = NavigationSuiteType.NavigationRail,  // 항상 NavigationRail 사용
     navigationSuiteItems = { /* ... */ }

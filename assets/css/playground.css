@@ -1,10 +1,10 @@
 /* ==========================================================================
    Code Playground
-   Editor, toolbar, output, and Expo Snack embed
+   Editor, toolbar, output, Kotlin Playground, Compose Preview, and Expo Snack
    ========================================================================== */
 
 /* ==========================================================================
-   Playground Container
+   Playground Container (shared)
    ========================================================================== */
 
 .playground-container {
@@ -17,7 +17,39 @@
 }
 
 /* ==========================================================================
-   Toolbar
+   Playground Header (shared)
+   ========================================================================== */
+
+.playground-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary, #282c34);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  gap: 8px;
+}
+
+.playground-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(97, 218, 251, 0.15);
+  color: #61dafb;
+  white-space: nowrap;
+}
+
+.playground-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   Toolbar (legacy)
    ========================================================================== */
 
 .playground-toolbar {
@@ -55,24 +87,27 @@
 }
 
 /* ==========================================================================
-   Buttons
+   Buttons (shared)
    ========================================================================== */
 
-.playground-run-btn {
+.playground-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 16px;
   border-radius: 4px;
-  border: none;
-  background: var(--accent, #61dafb);
-  color: var(--text-inverse, #1a1a2e);
   font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.playground-run-btn {
+  padding: 6px 16px;
+  border: none;
+  background: var(--accent, #61dafb);
+  color: var(--text-inverse, #1a1a2e);
+  font-weight: 600;
 }
 
 .playground-run-btn:hover {
@@ -96,19 +131,10 @@
 }
 
 .playground-reset-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
   padding: 6px 16px;
-  border-radius: 4px;
   border: 1px solid var(--border-color-strong, rgba(255, 255, 255, 0.2));
   background: transparent;
   color: var(--text-muted, #718096);
-  font-size: 13px;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .playground-reset-btn:hover {
@@ -126,20 +152,12 @@
   outline-offset: 2px;
 }
 
-/* Copy button */
 .playground-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 6px 12px;
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   background: transparent;
   color: var(--text-muted, #718096);
   font-size: 12px;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .playground-copy-btn:hover {
@@ -148,7 +166,7 @@
 }
 
 /* ==========================================================================
-   Editor Area
+   JS Playground Editor Area
    ========================================================================== */
 
 .playground-editor {
@@ -157,7 +175,6 @@
   position: relative;
 }
 
-/* CodeMirror overrides when embedded */
 .playground-editor .CodeMirror {
   height: auto;
   min-height: 120px;
@@ -168,24 +185,28 @@
   line-height: 1.6;
 }
 
-/* Plain textarea fallback */
-.playground-editor textarea {
+.playground-editor textarea,
+.playground-textarea {
   width: 100%;
   min-height: 120px;
-  padding: 12px;
+  padding: 12px 16px;
   border: none;
   background: var(--bg-code, #1e1e2e);
   color: var(--text-primary, #e0e0e0);
-  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace);
   font-size: 13px;
   line-height: 1.6;
   resize: vertical;
   outline: none;
-  tab-size: 2;
+  tab-size: 4;
+  white-space: pre;
+  overflow-x: auto;
+  display: block;
+  box-sizing: border-box;
 }
 
 /* ==========================================================================
-   Output Area
+   JS Playground Output Area
    ========================================================================== */
 
 .playground-output {
@@ -211,7 +232,8 @@
   color: var(--success, #4ecdc4);
 }
 
-.playground-output-label {
+.playground-output-label,
+.playground-output-header {
   display: block;
   font-size: 10px;
   font-weight: 600;
@@ -220,6 +242,209 @@
   color: var(--text-muted, #718096);
   margin-bottom: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.playground-output-content {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   Kotlin Playground (custom textarea + Kotlin Compiler API)
+   ========================================================================== */
+
+.playground-kotlin {
+  border-color: rgba(61, 220, 132, 0.3) !important;
+}
+
+.playground-kotlin .playground-header {
+  background: linear-gradient(135deg, rgba(61, 220, 132, 0.12), rgba(61, 220, 132, 0.04));
+}
+
+.playground-badge-kotlin {
+  background: rgba(61, 220, 132, 0.2) !important;
+  color: #3DDC84 !important;
+}
+
+.playground-kotlin .playground-run-btn {
+  background: #3DDC84;
+  color: #1a1a2e;
+}
+
+.playground-kotlin .playground-run-btn:hover {
+  background: #50e696;
+}
+
+/* Highlight overlay: pre sits behind textarea, textarea has transparent text */
+.playground-highlight-editor {
+  position: relative;
+  min-height: 100px;
+  background: var(--bg-code, #1e1e2e);
+}
+
+.playground-highlight-pre {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  box-sizing: border-box !important;
+  z-index: 1;
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace) !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  tab-size: 4 !important;
+}
+
+.playground-highlight-pre code {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  white-space: inherit !important;
+  tab-size: inherit !important;
+  display: inline-block;
+}
+
+.playground-kotlin-textarea {
+  width: 100%;
+  min-height: 100px;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  border: none !important;
+  background: transparent;
+  color: transparent;
+  caret-color: #a9b7c6;
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace) !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  resize: none !important;
+  outline: none !important;
+  tab-size: 4 !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: block;
+  box-sizing: border-box !important;
+  position: relative;
+  z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.playground-kotlin-textarea::selection {
+  background: rgba(61, 220, 132, 0.25);
+  color: transparent;
+}
+
+.playground-kotlin-textarea:focus {
+  box-shadow: inset 0 0 0 1px rgba(61, 220, 132, 0.3);
+}
+
+/* Kotlin Playground footer */
+.playground-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-secondary, #282c34);
+  font-size: 12px;
+}
+
+.playground-link {
+  color: #3DDC84;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.playground-link:hover {
+  text-decoration: underline;
+  color: #50e696;
+}
+
+.playground-info {
+  color: var(--text-muted, #718096);
+  font-size: 11px;
+}
+
+/* ==========================================================================
+   Compose Preview Playground
+   ========================================================================== */
+
+.playground-compose {
+  border-color: rgba(124, 77, 255, 0.3) !important;
+}
+
+.playground-compose .playground-header {
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.12), rgba(61, 220, 132, 0.08));
+}
+
+.playground-badge-compose {
+  background: rgba(124, 77, 255, 0.2) !important;
+  color: #b388ff !important;
+}
+
+.compose-code-area {
+  background: var(--bg-code, #1e1e2e);
+  overflow-x: auto;
+}
+
+.compose-code-area pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.compose-code-area code {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace) !important;
+}
+
+.compose-preview-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(124, 77, 255, 0.15);
+  background: rgba(124, 77, 255, 0.06);
+  color: var(--text-muted, #718096);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.compose-hint-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.compose-preview-hint code {
+  background: rgba(124, 77, 255, 0.2) !important;
+  padding: 1px 6px !important;
+  border-radius: 3px !important;
+  font-size: 11px !important;
+  color: #b388ff !important;
 }
 
 /* ==========================================================================
@@ -309,13 +534,14 @@
     border-radius: 8px;
   }
 
-  .playground-toolbar {
+  .playground-header {
     flex-wrap: wrap;
     padding: 6px 8px;
   }
 
   .playground-run-btn,
-  .playground-reset-btn {
+  .playground-reset-btn,
+  .playground-copy-btn {
     padding: 5px 12px;
     font-size: 12px;
   }
@@ -332,4 +558,87 @@
   .snack-placeholder {
     padding: 24px;
   }
+
+  .compose-preview-hint {
+    flex-wrap: wrap;
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+}
+
+/* ==========================================================================
+   Syntax Highlighting (IntelliJ Darcula Style for Kotlin/Compose)
+   ========================================================================== */
+
+.playground-highlight-pre code,
+.compose-code-area code,
+.snack-source code {
+  color: #a9b7c6 !important;
+}
+
+.playground-highlight-pre code .token.comment,
+.compose-code-area code .token.comment,
+.snack-source code .token.comment {
+  color: #808080 !important;
+  font-style: italic;
+}
+
+.playground-highlight-pre code .token.keyword,
+.compose-code-area code .token.keyword,
+.snack-source code .token.keyword {
+  color: #cc7832 !important;
+  font-weight: bold;
+}
+
+.playground-highlight-pre code .token.string,
+.compose-code-area code .token.string,
+.snack-source code .token.string,
+.playground-highlight-pre code .token.char,
+.compose-code-area code .token.char {
+  color: #6a8759 !important;
+}
+
+.playground-highlight-pre code .token.number,
+.compose-code-area code .token.number,
+.snack-source code .token.number,
+.playground-highlight-pre code .token.boolean,
+.compose-code-area code .token.boolean {
+  color: #6897bb !important;
+}
+
+.playground-highlight-pre code .token.function,
+.compose-code-area code .token.function,
+.snack-source code .token.function {
+  color: #ffc66d !important;
+}
+
+.playground-highlight-pre code .token.class-name,
+.compose-code-area code .token.class-name,
+.snack-source code .token.class-name {
+  color: #A9B7C6 !important;
+}
+
+.playground-highlight-pre code .token.property,
+.compose-code-area code .token.property,
+.playground-highlight-pre code .token.variable,
+.compose-code-area code .token.variable {
+  color: #9876aa !important;
+}
+
+.playground-highlight-pre code .token.annotation,
+.compose-code-area code .token.annotation {
+  color: #bbb529 !important;
+}
+
+.playground-highlight-pre code .token.operator,
+.compose-code-area code .token.operator,
+.playground-highlight-pre code .token.punctuation,
+.compose-code-area code .token.punctuation {
+  color: #a9b7c6 !important;
+}
+
+.playground-kotlin-textarea {
+  color: transparent !important;
+  caret-color: #a9b7c6 !important;
+  background: transparent !important;
 }

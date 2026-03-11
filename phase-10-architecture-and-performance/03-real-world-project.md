@@ -165,7 +165,7 @@ my-app/
 
 ### Hilt 설정 (DI)
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts (Project)
 plugins {
     id("com.google.dagger.hilt.android") version "2.54" apply false
@@ -185,7 +185,7 @@ dependencies {
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // Application
 @HiltAndroidApp
 class MyApplication : Application()
@@ -208,7 +208,7 @@ fun HomeScreen(
 
 ### Coil 설정 (이미지 로딩)
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
@@ -216,7 +216,7 @@ dependencies {
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // Compose에서 이미지 로딩
 @Composable
 fun UserAvatar(imageUrl: String) {
@@ -235,7 +235,7 @@ fun UserAvatar(imageUrl: String) {
 
 ### Room 설정 (로컬 DB)
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 dependencies {
     implementation("androidx.room:room-runtime:2.7.1")
@@ -244,7 +244,7 @@ dependencies {
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // Entity
 @Entity(tableName = "tasks")
 data class TaskEntity(
@@ -279,14 +279,14 @@ abstract class AppDatabase : RoomDatabase() {
 
 ### DataStore 설정 (설정 저장)
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.4")
 }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // Preferences DataStore
 val Context.dataStore by preferencesDataStore(name = "settings")
 
@@ -314,7 +314,7 @@ class UserPreferences(private val dataStore: DataStore<Preferences>) {
 
 ### Navigation 그래프 설계 (Type-Safe Routes — Navigation 2.9.7)
 
-```kotlin
+```kotlin [compose-playground]
 // 각 feature 모듈에서 @Serializable 라우트 정의
 // feature-home/navigation/HomeNavigation.kt
 @Serializable object HomeRoute
@@ -355,7 +355,7 @@ fun NavController.navigateToDetail(taskId: Long) {
 
 ### 앱 수준 Navigation 통합
 
-```kotlin
+```kotlin [compose-playground]
 // app/navigation/AppNavGraph.kt
 @Composable
 fun AppNavGraph(
@@ -389,7 +389,7 @@ fun AppNavGraph(
 
 ### ViewModel에서 Navigation 인수 받기
 
-```kotlin
+```kotlin [compose-playground]
 // Hilt + SavedStateHandle로 Navigation 인수 받기
 @HiltViewModel
 class DetailViewModel @Inject constructor(
@@ -430,7 +430,7 @@ class DetailViewModel @Inject constructor(
 
 ### settings.gradle.kts
 
-```kotlin
+```kotlin [compose-playground]
 // settings.gradle.kts
 pluginManagement {
     repositories {
@@ -462,7 +462,7 @@ include(":feature:feature-settings")
 
 ### 공통 빌드 설정 (Convention Plugin)
 
-```kotlin
+```kotlin [compose-playground]
 // build-logic/convention/src/main/kotlin/AndroidComposeConvention.kt
 // 모든 Compose 모듈에 공통 설정을 적용하는 플러그인
 class AndroidComposeConventionPlugin : Plugin<Project> {
@@ -493,7 +493,7 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
 
 ### feature 모듈 build.gradle.kts 예시
 
-```kotlin
+```kotlin [compose-playground]
 // feature/feature-home/build.gradle.kts
 plugins {
     id("myapp.android.library")     // 커스텀 Convention Plugin
@@ -521,7 +521,7 @@ dependencies {
 
 ### Result 래퍼 클래스
 
-```kotlin
+```kotlin [compose-playground]
 // core-domain/model/Result.kt
 sealed interface Result<out T> {
     data class Success<T>(val data: T) : Result<T>
@@ -547,7 +547,7 @@ fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> = when (this) {
 
 ### Repository에서 Result 반환
 
-```kotlin
+```kotlin [compose-playground]
 class TaskRepositoryImpl(
     private val taskDao: TaskDao,
     private val apiService: TaskApiService
@@ -578,7 +578,7 @@ class TaskRepositoryImpl(
 
 ### ViewModel에서 에러 처리
 
-```kotlin
+```kotlin [compose-playground]
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository
@@ -629,7 +629,7 @@ class HomeViewModel @Inject constructor(
 
 ### 컴포저블에서 일회성 이벤트 처리
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -665,7 +665,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
 BOM을 사용하면 **모든 Compose 라이브러리의 버전을 하나로 통합 관리**합니다.
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2026.02.01")
@@ -747,7 +747,7 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts에서 Version Catalog 사용
 dependencies {
     implementation(platform(libs.compose.bom))
@@ -791,7 +791,7 @@ dependencies {
 
 ### XML 안에서 Compose 사용 (ComposeView)
 
-```kotlin
+```kotlin [compose-playground]
 // Fragment에서 Compose 사용
 class HomeFragment : Fragment() {
 
@@ -817,7 +817,7 @@ class HomeFragment : Fragment() {
 
 ### Compose 안에서 XML View 사용 (AndroidView)
 
-```kotlin
+```kotlin [compose-playground]
 // Compose에서 기존 XML View 사용
 @Composable
 fun LegacyMapView() {
@@ -871,7 +871,7 @@ fun LegacyLayout() {
 
 ### 단위 테스트 (ViewModel)
 
-```kotlin
+```kotlin [compose-playground]
 // 테스트 유틸: MainDispatcher 교체 Rule
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -939,7 +939,7 @@ class HomeViewModelTest {
 
 ### 통합 테스트 (UI)
 
-```kotlin
+```kotlin [compose-playground]
 // UI 통합 테스트
 class HomeScreenTest {
 
@@ -1000,7 +1000,7 @@ class HomeScreenTest {
 
 ### E2E 테스트
 
-```kotlin
+```kotlin [compose-playground]
 // E2E 테스트 (실제 앱 흐름 테스트)
 @HiltAndroidTest
 class TaskFlowE2ETest {
@@ -1181,7 +1181,7 @@ jobs:
 
 ### 앱 서명
 
-```kotlin
+```kotlin [compose-playground]
 // build.gradle.kts
 android {
     signingConfigs {

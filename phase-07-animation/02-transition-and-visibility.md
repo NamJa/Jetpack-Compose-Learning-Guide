@@ -30,7 +30,7 @@
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BasicVisibilityExample() {
     var isVisible by remember { mutableStateOf(true) }
@@ -87,7 +87,7 @@ AnimatedVisibility 동작 흐름
 
 ### 진입/종료 애니메이션 커스터마이징
 
-```kotlin
+```kotlin [compose-playground]
 AnimatedVisibility(
     visible = isVisible,
     enter = slideInVertically() + fadeIn(),   // 아래에서 위로 슬라이드 + 페이드
@@ -116,7 +116,7 @@ AnimatedVisibility(
 
 ### 코드 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun EnterTransitionExamples() {
     var showItems by remember { mutableStateOf(false) }
@@ -192,7 +192,7 @@ fun EnterTransitionExamples() {
 
 ### 코드 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ExitTransitionExamples() {
     var isVisible by remember { mutableStateOf(true) }
@@ -253,7 +253,7 @@ fadeIn() + slideInVertically() + scaleIn()
 
 ### 실전 예제: 알림 카드
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun NotificationCard(isShown: Boolean) {
     AnimatedVisibility(
@@ -327,7 +327,7 @@ AnimatedVisibility               AnimatedContent
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AnimatedContentExample() {
     var count by remember { mutableIntStateOf(0) }
@@ -367,7 +367,7 @@ fun AnimatedContentExample() {
 
 ### 화면 상태 전환
 
-```kotlin
+```kotlin [compose-playground]
 sealed class UiState {
     data object Loading : UiState()
     data class Success(val data: String) : UiState()
@@ -428,7 +428,7 @@ fun StatefulScreen(state: UiState) {
 
 > **언제 사용하나요?**: 컴포저블 간 전환에서 단순히 페이드만 필요하다면 `AnimatedContent` 대신 `Crossfade`를 사용하세요. 코드가 더 간결하고 불필요한 `transitionSpec` 설정이 필요 없습니다. 탭 전환, 화면 상태 교체 등 **슬라이드/스케일 없이 페이드만 원하는 모든 경우**에 적합합니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CrossfadeExample() {
     var currentTab by remember { mutableStateOf("home") }
@@ -516,7 +516,7 @@ updateTransition 방식 (통합 관리)
 
 ### 코드 예제: 선택 가능한 카드
 
-```kotlin
+```kotlin [compose-playground]
 enum class CardState {
     Normal, Selected, Disabled
 }
@@ -589,7 +589,7 @@ fun SelectableCard(cardState: CardState) {
 
 ### 사용 예시
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CardDemo() {
     var state by remember { mutableStateOf(CardState.Normal) }
@@ -628,7 +628,7 @@ fun CardDemo() {
 
 ### 펄스(맥박) 효과
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun PulsingDot() {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -668,7 +668,7 @@ fun PulsingDot() {
 
 ### 색상 순환 애니메이션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColorCyclingBorder() {
     val infiniteTransition = rememberInfiniteTransition(label = "colorCycle")
@@ -701,7 +701,7 @@ fun ColorCyclingBorder() {
 
 ### 로딩 스피너 (회전)
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RotatingLoader() {
     val infiniteTransition = rememberInfiniteTransition(label = "rotate")
@@ -767,7 +767,7 @@ fun RotatingLoader() {
 
 Navigation Compose에서 화면 전환 애니메이션은 이제 **공식 API**로 지원됩니다. `composable<Route>()`에 `enterTransition`과 `exitTransition`을 직접 지정할 수 있습니다:
 
-```kotlin
+```kotlin [compose-playground]
 NavHost(
     navController = navController,
     startDestination = HomeRoute

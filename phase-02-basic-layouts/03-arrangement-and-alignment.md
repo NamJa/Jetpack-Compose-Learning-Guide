@@ -56,7 +56,7 @@ Column은 자식을 **세로로** 나열하므로:
 
 ### verticalArrangement 옵션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnArrangementExamples() {
     // 각 예시는 Column(modifier = Modifier.fillMaxSize()) 안에 세 개의 Box를 배치
@@ -102,7 +102,7 @@ SpaceBetween     SpaceAround     SpaceEvenly
 
 ### horizontalAlignment 옵션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnAlignmentExamples() {
     val boxModifier = Modifier.size(width = 80.dp, height = 40.dp).background(Color.Blue)
@@ -131,7 +131,7 @@ Start (기본)            CenterHorizontally          End
 
 ### Column 전체 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnFullExample() {
     Column(
@@ -158,7 +158,7 @@ Row는 자식을 **가로로** 나열하므로:
 
 ### horizontalArrangement 옵션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowArrangementExamples() {
     val boxModifier = Modifier.size(50.dp).background(Color.Blue)
@@ -212,7 +212,7 @@ SpaceEvenly:
 
 ### verticalAlignment 옵션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowAlignmentExamples() {
     Row(
@@ -250,7 +250,7 @@ Box는 자식을 겹쳐 배치하므로, **2차원 정렬**을 `contentAlignment
 
 ### contentAlignment 옵션
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BoxContentAlignmentExample() {
     Box(
@@ -278,7 +278,7 @@ fun BoxContentAlignmentExample() {
 
 ### 코드로 보는 9가지 위치
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AllBoxAlignments() {
     val alignments = listOf(
@@ -323,7 +323,7 @@ fun AllBoxAlignments() {
 
 `spacedBy`는 자식들 사이에 **균일한 고정 간격**을 넣습니다. Spacer를 일일이 추가하지 않아도 됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun SpacedByExample() {
     // Column에서 세로 간격
@@ -441,7 +441,7 @@ Alignment.BottomStart    Alignment.BottomCenter    Alignment.BottomEnd
 
 ### Column에서 개별 정렬
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ColumnIndividualAlignment() {
     Column(
@@ -473,7 +473,7 @@ fun ColumnIndividualAlignment() {
 
 ### Row에서 개별 정렬
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun RowIndividualAlignment() {
     Row(
@@ -506,7 +506,7 @@ fun RowIndividualAlignment() {
 
 ### Box에서 개별 정렬
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun BoxIndividualAlignment() {
     Box(
@@ -587,7 +587,7 @@ fun BoxIndividualAlignment() {
 
 **Compose: 동일한 레이아웃**
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CenteredColumn() {
     Column(
@@ -607,7 +607,7 @@ fun CenteredColumn() {
 
 ### 예제 1: 카드 레이아웃
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun InfoCard(
     title: String,
@@ -679,7 +679,7 @@ fun InfoCard(
 
 ### 예제 2: 리스트 아이템
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun MessageItem(
     senderName: String,
@@ -779,7 +779,7 @@ fun MessageItem(
 
 ### 예제 3: 로그인 화면
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier) {
     Column(

@@ -29,7 +29,7 @@
 - **typography**: 텍스트 스타일 체계
 - **shapes**: 컴포넌트의 모서리 모양 체계
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.Typography
@@ -80,7 +80,7 @@ M3 Color Scheme은 **29개의 색상 역할(role)** 로 구성됩니다. 각 역
 | `background` | 전체 화면 배경 | Scaffold 배경 |
 | `error` | 오류 표시 | 유효성 검사 오류 |
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
@@ -146,7 +146,7 @@ ui/theme/
 └── Type.kt         // Typography 정의
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // Color.kt (Material Theme Builder가 생성)
 val md_theme_light_primary = Color(0xFF6750A4)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
@@ -170,7 +170,7 @@ private val LightColorScheme = lightColorScheme(
 
 Android 12(API 31) 이상에서는 **Dynamic Color**를 지원합니다. 사용자의 배경화면에서 자동으로 색상을 추출하여 앱에 적용하는 기능입니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -218,7 +218,7 @@ fun MyAppTheme(
 
 M3 Typography는 **15개의 텍스트 스타일 슬롯**을 제공합니다. Display, Headline, Title, Body, Label의 5가지 카테고리에 각각 Large, Medium, Small이 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -320,7 +320,7 @@ val MyTypography = Typography(
 
 M3 Shape 시스템은 컴포넌트의 **모서리 둥글기**를 통일되게 관리합니다. 5개의 크기 슬롯이 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.Shapes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
@@ -343,7 +343,7 @@ val MyShapes = Shapes(
 )
 ```
 
-```kotlin
+```kotlin [compose-playground]
 // 사용 예시
 Card(
     shape = MaterialTheme.shapes.medium  // 12.dp 둥글기
@@ -366,7 +366,7 @@ val customShape = RoundedCornerShape(
 
 테마를 정의한 후에는 `MaterialTheme` 객체를 통해 어디서든 접근할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ThemedCard() {
     Card(
@@ -423,7 +423,7 @@ fun ThemedButton() {
 
 **자주 쓰는 접근 패턴:**
 
-```kotlin
+```kotlin [compose-playground]
 // 색상
 MaterialTheme.colorScheme.primary
 MaterialTheme.colorScheme.onPrimary
@@ -448,7 +448,7 @@ MaterialTheme.shapes.large
 
 `isSystemInDarkTheme()`은 시스템의 다크모드 설정을 감지하여, 라이트/다크 테마를 자동으로 전환합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
@@ -478,7 +478,7 @@ fun MyAppTheme(
 
 ### 앱 내 다크모드 토글 구현
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun MyApp() {
     // 사용자가 앱 내에서 직접 테마를 전환할 수 있도록
@@ -512,7 +512,7 @@ fun MyApp() {
 
 ### 테마에 따라 다른 리소스 사용
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun AdaptiveImage() {
     val isDark = isSystemInDarkTheme()
@@ -536,7 +536,7 @@ Material3 **1.4.0**부터 `MotionScheme` API가 **Stable**로 승격되었습니
 
 M3 컴포넌트(예: `NavigationBar`, `FloatingActionButton`, `ModalBottomSheet` 등)는 내부적으로 `MotionScheme`을 사용하여 일관된 모션을 제공합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 
@@ -570,7 +570,7 @@ fun AnimatedContent() {
 
 Material3 1.4.0에서 `TextAutoSize` 기능이 추가되었습니다. 텍스트가 지정된 영역에 맞도록 **자동으로 크기를 조정**합니다.
 
-```kotlin
+```kotlin [compose-playground]
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.TextAutoSize
 

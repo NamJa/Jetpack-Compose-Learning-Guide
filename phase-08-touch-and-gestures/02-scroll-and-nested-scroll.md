@@ -40,7 +40,7 @@ verticalScroll 동작 원리
 
 ### 기본 사용법
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun VerticalScrollExample() {
     Column(
@@ -67,7 +67,7 @@ fun VerticalScrollExample() {
 
 ### 수평 스크롤
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun HorizontalScrollExample() {
     Row(
@@ -110,7 +110,7 @@ fun HorizontalScrollExample() {
 
 ### 스크롤 위치 읽기
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollPositionExample() {
     val scrollState = rememberScrollState()
@@ -150,7 +150,7 @@ fun ScrollPositionExample() {
 
 ### 스크롤에 따른 동적 UI
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollAwareHeader() {
     val scrollState = rememberScrollState()
@@ -198,7 +198,7 @@ fun ScrollAwareHeader() {
 
 ### scrollTo와 animateScrollTo
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ProgrammaticScrollExample() {
     val scrollState = rememberScrollState()
@@ -255,7 +255,7 @@ fun ProgrammaticScrollExample() {
 
 ### "맨 위로" FAB 구현
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ScrollToTopFab() {
     val scrollState = rememberScrollState()
@@ -356,7 +356,7 @@ fun ScrollToTopFab() {
 
 ### 접히는 헤더 예제
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun CollapsibleHeaderExample() {
     val headerHeight = 200.dp
@@ -436,7 +436,7 @@ fun CollapsibleHeaderExample() {
 
 ### Compose 안에 View가 있을 때
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun ComposeWithAndroidView() {
     // Compose의 LazyColumn 안에 Android RecyclerView가 있을 때
@@ -472,7 +472,7 @@ fun ComposeWithAndroidView() {
 
 XML 레이아웃에서 `ComposeView`를 사용하는 경우, `ComposeView`가 부모 View의 `NestedScrollingParent`와 자동으로 연동됩니다.
 
-```kotlin
+```kotlin [compose-playground]
 // Activity나 Fragment에서
 val composeView = ComposeView(this).apply {
     setContent {
@@ -498,7 +498,7 @@ val composeView = ComposeView(this).apply {
 
 ### rememberLazyListState
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LazyListStateExample() {
     val listState = rememberLazyListState()
@@ -529,7 +529,7 @@ fun LazyListStateExample() {
 
 ### 프로그래밍 방식 스크롤
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun LazyListScrollControl() {
     val listState = rememberLazyListState()
@@ -578,7 +578,7 @@ fun LazyListScrollControl() {
 
 ### 현재 보이는 아이템 정보 활용
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun VisibleItemTracker() {
     val listState = rememberLazyListState()
@@ -634,7 +634,7 @@ fun VisibleItemTracker() {
 
 Foundation 1.9부터 **두 축을 동시에 스크롤**할 수 있는 `Modifier.scrollable2D`와 `Scrollable2DState`가 추가되었습니다. 기존에는 수평/수직 스크롤을 별도로 처리해야 했지만, 이제 하나의 수정자로 양축 스크롤을 동시에 지원할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun TwoDimensionalScrollExample() {
     val state = rememberScrollable2DState { delta ->
@@ -673,7 +673,7 @@ fun TwoDimensionalScrollExample() {
 
 Foundation 1.10에서는 `Modifier.scrollIndicator`와 `ScrollIndicatorFactory`를 사용하여 **커스텀 스크롤 인디케이터**를 구현할 수 있습니다.
 
-```kotlin
+```kotlin [compose-playground]
 // 커스텀 스크롤 인디케이터 팩토리 예시
 val customIndicatorFactory = ScrollIndicatorFactory { state ->
     // state: ScrollIndicatorState
@@ -698,7 +698,7 @@ Box(
 
 Pager의 프리페치 전략이 **단일 아이템 프리페치에서 Cache Window 기반 프리페치**로 업데이트되었습니다. 이전에는 다음 1개 아이템만 미리 로드했지만, 이제는 윈도우 범위 내의 여러 아이템을 프리페치합니다. 또한 **초기 프리페치(initial prefetching)가 기본적으로 활성화**되어 첫 화면 렌더링이 빨라졌습니다.
 
-```kotlin
+```kotlin [compose-playground]
 // Pager에서 프리페치 전략 커스터마이징
 HorizontalPager(
     state = rememberPagerState { pageCount },

@@ -46,7 +46,7 @@ MVVM(Model-View-ViewModel)은 Android 공식 권장 아키텍처 패턴입니다
 
 ### Compose에서의 MVVM
 
-```kotlin
+```kotlin [compose-playground]
 // ── Model (데이터) ──
 data class Task(
     val id: Long,
@@ -164,7 +164,7 @@ fun TaskContent(
 
 ### UDF 실전 예시
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 양방향 데이터 흐름
 @Composable
 fun BadSearchScreen() {
@@ -251,7 +251,7 @@ fun SearchContent(
 
 ### Lifecycle 2.10.0: rememberLifecycleOwner
 
-```kotlin
+```kotlin [compose-playground]
 // Compose 트리 내에서 스코프된 LifecycleOwner 사용
 @Composable
 fun ScopedScreen() {
@@ -274,7 +274,9 @@ fun ScopedScreen() {
 
 ### 타입 안전한 Navigation 인수: savedStateHandle.toRoute()
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // Navigation 경로를 @Serializable data class로 정의
 @Serializable
 data class DetailRoute(val taskId: Long)
@@ -291,11 +293,13 @@ class DetailViewModel @Inject constructor(
 
     // ...
 }
+//sampleEnd
+}
 ```
 
 ### CreationExtras 빌더 함수
 
-```kotlin
+```kotlin [compose-playground]
 // CreationExtras 빌더 함수로 ViewModel 팩토리를 간결하게 작성
 val factory = viewModelFactory {
     initializer {
@@ -340,7 +344,7 @@ UI Layer는 사용자에게 보이는 모든 것을 담당합니다.
 
 ### 실전 코드
 
-```kotlin
+```kotlin [compose-playground]
 // ── UiState 정의 ──
 data class ProfileUiState(
     val user: User? = null,
@@ -448,7 +452,9 @@ Domain Layer는 **비즈니스 로직을 캡슐화**합니다. 필수가 아닌 
 
 ### UseCase 구현
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // UseCase: 하나의 비즈니스 작업을 수행
 class GetFilteredTasksUseCase(
     private val taskRepository: TaskRepository
@@ -506,6 +512,8 @@ class TaskViewModel(
         }
     }
 }
+//sampleEnd
+}
 ```
 
 ### UseCase를 사용해야 하는 경우
@@ -552,7 +560,9 @@ Data Layer는 앱의 **데이터를 관리**합니다. Repository 패턴으로 �
 
 ### Repository 구현
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // Repository 인터페이스
 interface TaskRepository {
     fun getTasksStream(): Flow<List<Task>>
@@ -603,11 +613,15 @@ class DefaultTaskRepository(
         }
     }
 }
+//sampleEnd
+}
 ```
 
 ### DataSource 구현
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // Local DataSource (Room)
 class TaskLocalDataSource(private val taskDao: TaskDao) {
     fun getTasksStream(): Flow<List<Task>> = taskDao.observeAll()
@@ -624,6 +638,8 @@ class TaskRemoteDataSource(private val apiService: TaskApiService) {
     suspend fun updateTask(task: Task) = apiService.updateTask(task.id, task)
     suspend fun deleteTask(id: Long) = apiService.deleteTask(id)
 }
+//sampleEnd
+}
 ```
 
 ---
@@ -632,7 +648,9 @@ class TaskRemoteDataSource(private val apiService: TaskApiService) {
 
 ### 왜 sealed interface를 사용하는가?
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // ❌ 잘못된 예: 개별 변수로 상태 관리
 class TaskViewModel : ViewModel() {
     var tasks = mutableStateListOf<Task>()
@@ -649,11 +667,13 @@ sealed interface TaskUiState {
     data class Success(val tasks: List<Task>) : TaskUiState
     data class Error(val message: String) : TaskUiState
 }
+//sampleEnd
+}
 ```
 
 ### sealed interface UiState 패턴
 
-```kotlin
+```kotlin [compose-playground]
 // 화면의 모든 가능한 상태를 정의
 sealed interface NoteListUiState {
     data object Loading : NoteListUiState
@@ -755,7 +775,9 @@ fun NoteListContent(uiState: NoteListUiState) {
 
 ### 이벤트 모델링
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // 사용자 동작을 이벤트로 정의
 sealed class NoteListEvent {
     data class OnSearchQueryChange(val query: String) : NoteListEvent()
@@ -765,11 +787,15 @@ sealed class NoteListEvent {
     data object OnAddNoteClick : NoteListEvent()
     data object OnRefresh : NoteListEvent()
 }
+//sampleEnd
+}
 ```
 
 ### ViewModel에서 이벤트 처리
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 class NoteListViewModel(
     private val noteRepository: NoteRepository
 ) : ViewModel() {
@@ -805,11 +831,13 @@ class NoteListViewModel(
 
     // ...
 }
+//sampleEnd
+}
 ```
 
 ### 컴포저블에서 이벤트 전달
 
-```kotlin
+```kotlin [compose-playground]
 @Composable
 fun NoteListScreen(
     viewModel: NoteListViewModel = viewModel(),
@@ -855,7 +883,7 @@ fun NoteListContent(
 
 ### 최소 정보 전달 원칙
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 객체 전체를 전달
 @Composable
 fun UserAvatar(user: User) {
@@ -883,7 +911,7 @@ fun UserAvatar(
 
 ### 콜백 함수 설계
 
-```kotlin
+```kotlin [compose-playground]
 // ❌ 잘못된 예: 불필요한 정보를 콜백으로 전달
 @Composable
 fun TaskItem(
@@ -918,7 +946,7 @@ fun TaskItem(
 
 ### 호출하는 쪽
 
-```kotlin
+```kotlin [compose-playground]
 // 필요한 데이터만 추출해서 전달
 LazyColumn {
     items(tasks, key = { it.id }) { task ->
@@ -979,7 +1007,9 @@ app/src/main/java/com/example/memo/
 
 ### 도메인 모델
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // domain/model/Memo.kt
 data class Memo(
     val id: Long = 0,
@@ -988,11 +1018,15 @@ data class Memo(
     val createdAt: Long = System.currentTimeMillis(),
     val color: Int = 0xFFFFFF
 )
+//sampleEnd
+}
 ```
 
 ### Repository
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // domain/repository/MemoRepository.kt
 interface MemoRepository {
     fun getMemosStream(): Flow<List<Memo>>
@@ -1023,11 +1057,15 @@ class MemoRepositoryImpl(
         memoDao.deleteById(id)
     }
 }
+//sampleEnd
+}
 ```
 
 ### ViewModel과 UiState
 
-```kotlin
+```kotlin [kotlin-playground]
+fun main() {
+//sampleStart
 // ui/list/MemoListUiState.kt
 sealed interface MemoListUiState {
     data object Loading : MemoListUiState
@@ -1074,11 +1112,13 @@ class MemoListViewModel(
         }
     }
 }
+//sampleEnd
+}
 ```
 
 ### Screen과 Content
 
-```kotlin
+```kotlin [compose-playground]
 // ui/list/MemoListScreen.kt
 @Composable
 fun MemoListScreen(
@@ -1201,7 +1241,7 @@ Compose 자체도 여러 레이어로 구성되어 있습니다. 각 레이어�
 
 ### 레이어를 이해해야 하는 이유
 
-```kotlin
+```kotlin [compose-playground]
 // Material의 Button이 마음에 안 들면?
 // → Foundation 레이어에서 직접 구현 가능!
 
