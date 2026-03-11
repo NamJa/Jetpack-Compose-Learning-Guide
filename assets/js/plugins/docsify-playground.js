@@ -237,7 +237,7 @@
     runBtn.disabled = true;
     runBtn.textContent = '\u23F3 \uC2E4\uD589 \uC911...';
 
-    fetch('https://api.kotlinlang.org/api/2.0.21/compiler/run', {
+    fetch('https://api.kotlinlang.org/api/2.3.10/compiler/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
