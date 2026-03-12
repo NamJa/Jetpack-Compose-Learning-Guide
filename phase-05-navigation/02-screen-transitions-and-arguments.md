@@ -2,38 +2,38 @@
 
 > **"화면 사이에 데이터를 주고받는 것은, 앱의 기능을 연결하는 다리를 놓는 것이다."**
 >
-> 내비게이션에서 가장 실용적인 부분은 화면 간 데이터 전달입니다. 이 문서에서는 Type-Safe한 인수 전달, ViewModel 연동, 화면 전환 애니메이션, 그리고 결과 반환 패턴까지 다룹니다.
+> 내비게이션에서 가장 실용적인 부분은 화면 간 데이터 전달입니다. 이 문서에서는 Navigation3에서의 타입 안전한 인수 전달, ViewModel 연동, 화면 전환 애니메이션, 그리고 다이얼로그 패턴까지 다룹니다.
 
 ---
 
 ## 목차
 
-1. [인수 전달: @Serializable data class에 프로퍼티 추가](#1-인수-전달-serializable-data-class에-프로퍼티-추가)
-2. [backStackEntry.toRoute\<T\>()로 인수 읽기](#2-backstackentrytoroute로-인수-읽기)
+1. [인수 전달: NavKey data class에 프로퍼티 추가](#1-인수-전달-navkey-data-class에-프로퍼티-추가)
+2. [entry\<T\> { key -> }에서 인수 읽기](#2-entryt--key--에서-인수-읽기)
 3. [복잡한 데이터: ID만 전달하고 ViewModel에서 로드](#3-복잡한-데이터-id만-전달하고-viewmodel에서-로드)
-4. [SavedStateHandle.toRoute\<T\>()](#4-savedstatehandletoroute)
-5. [딥 링크와 Type-Safe 경로](#5-딥-링크와-type-safe-경로)
-6. [화면 전환 애니메이션: enterTransition, exitTransition](#6-화면-전환-애니메이션-entertransition-exittransition)
-7. [Navigation에서 결과 반환: savedStateHandle](#7-navigation에서-결과-반환-savedstatehandle)
+4. [ViewModel 스코핑: NavEntryDecorator](#4-viewmodel-스코핑-naventrydecorator)
+5. [화면 전환 애니메이션: transitionSpec](#5-화면-전환-애니메이션-transitionspec)
+6. [다이얼로그: DialogSceneStrategy](#6-다이얼로그-dialogscenestrategy)
 
 ---
 
-## 1. 인수 전달: @Serializable data class에 프로퍼티 추가
+## 1. 인수 전달: NavKey data class에 프로퍼티 추가
 
-Type-Safe Navigation에서 인수를 전달하려면, **경로(Route) data class에 프로퍼티를 추가**하기만 하면 됩니다. Navigation 라이브러리가 자동으로 직렬화/역직렬화를 처리합니다.
+Navigation3에서 인수를 전달하려면, **NavKey data class에 프로퍼티를 추가**하기만 하면 됩니다. `@Serializable`과 `NavKey` 인터페이스 덕분에 직렬화/역직렬화가 자동으로 처리됩니다.
 
 ```kotlin [compose-playground]
 import kotlinx.serialization.Serializable
+import androidx.navigation3.runtime.NavKey
 
 // 인수 없는 경로
 @Serializable
-object Home
+data object Home : NavKey
 
 // 필수 인수가 있는 경로
 @Serializable
 data class Detail(
     val itemId: Int
-)
+) : NavKey
 
 // 여러 인수 + 선택적(optional) 인수
 @Serializable
@@ -41,103 +41,109 @@ data class Search(
     val query: String,
     val category: String = "all",  // 기본값이 있으면 선택적 인수
     val page: Int = 1
-)
+) : NavKey
 
 // Nullable 인수
 @Serializable
 data class UserProfile(
     val userId: String,
     val tab: String? = null  // null 허용
-)
+) : NavKey
 ```
 
 **지원되는 인수 타입:**
 - 기본 타입: `Int`, `Long`, `Float`, `Boolean`, `String`
 - Nullable 버전: `Int?`, `String?` 등
 - Enum 클래스 (`@Serializable` 필요)
-- Value class: `@JvmInline value class UserId(val value: String)` 등 (Navigation 2.9+)
-- 커스텀 타입 (커스텀 `NavType` 필요, 고급 주제)
+- Value class: `@JvmInline value class UserId(val value: String)` 등
+- 커스텀 타입 (Kotlin Serialization의 `@Serializable`이면 가능)
 
 ---
 
-## 2. backStackEntry.toRoute\<T\>()로 인수 읽기
+## 2. entry\<T\> { key -> }에서 인수 읽기
 
-화면에서 전달받은 인수를 읽으려면, `composable<Route>` 블록에서 `backStackEntry.toRoute<T>()`를 호출합니다.
+Navigation3에서 인수를 읽는 방법은 매우 직관적입니다. `entry<T> { key -> }` 람다에서 **`key` 파라미터가 이미 해당 NavKey 타입으로 전달**되므로, `toRoute<T>()`같은 변환이 필요 없습니다.
 
 ```kotlin [compose-playground]
-import androidx.navigation.toRoute
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 
 @Composable
-fun MyNavHost(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = Home
-    ) {
-        composable<Home> {
-            HomeScreen(
-                onItemClick = { itemId ->
-                    // 인수를 담아 이동
-                    navController.navigate(Detail(itemId = itemId))
-                },
-                onSearch = { query ->
-                    // 선택적 인수는 기본값 사용 가능
-                    navController.navigate(Search(query = query))
-                }
-            )
+fun MyApp() {
+    val backStack = rememberNavBackStack(Home)
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<Home> {
+                HomeScreen(
+                    onItemClick = { itemId ->
+                        // 인수를 담아 이동
+                        backStack.add(Detail(itemId = itemId))
+                    },
+                    onSearch = { query ->
+                        // 선택적 인수는 기본값 사용 가능
+                        backStack.add(Search(query = query))
+                    }
+                )
+            }
+
+            entry<Detail> { key ->
+                // key는 이미 Detail 타입 — 바로 프로퍼티 접근
+                DetailScreen(
+                    itemId = key.itemId,
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+
+            entry<Search> { key ->
+                // key는 이미 Search 타입
+                SearchScreen(
+                    query = key.query,
+                    category = key.category,  // 전달하지 않으면 "all"
+                    page = key.page           // 전달하지 않으면 1
+                )
+            }
         }
-
-        composable<Detail> { backStackEntry ->
-            // toRoute<T>()로 타입 안전하게 인수 추출
-            val route = backStackEntry.toRoute<Detail>()
-
-            DetailScreen(
-                itemId = route.itemId,
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable<Search> { backStackEntry ->
-            val route = backStackEntry.toRoute<Search>()
-
-            SearchScreen(
-                query = route.query,
-                category = route.category,  // 전달하지 않으면 "all"
-                page = route.page           // 전달하지 않으면 1
-            )
-        }
-    }
+    )
 }
 ```
 
 **사용 흐름 요약:**
-1. `@Serializable data class`에 프로퍼티 정의
-2. `navController.navigate(Route(arg1, arg2))`로 이동
-3. `backStackEntry.toRoute<Route>()`로 인수 읽기
+1. `@Serializable data class ... : NavKey`에 프로퍼티 정의
+2. `backStack.add(Route(arg1, arg2))`로 이동
+3. `entry<Route> { key -> key.arg1 }` 로 인수 읽기
+
+**Navigation 2.x와의 비교:**
+
+| 단계 | Navigation 2.x | Navigation3 |
+|------|---------------|-------------|
+| 이동 | `navController.navigate(Detail(itemId = 42))` | `backStack.add(Detail(itemId = 42))` |
+| 인수 읽기 | `backStackEntry.toRoute<Detail>().itemId` | `key.itemId` (람다 파라미터) |
 
 ---
 
 ## 3. 복잡한 데이터: ID만 전달하고 ViewModel에서 로드
 
-Navigation으로 전달하는 데이터는 **가능한 한 최소화**해야 합니다. 복잡한 객체(예: 상품 전체 정보)를 직접 전달하는 대신, **ID만 전달하고 ViewModel에서 데이터를 로드**하는 패턴이 권장됩니다.
+Navigation으로 전달하는 데이터는 **가능한 한 최소화**해야 합니다. 복잡한 객체(예: 상품 전체 정보)를 직접 전달하는 대신, **ID만 전달하고 ViewModel에서 데이터를 로드**하는 패턴이 권장됩니다. 이 원칙은 Navigation3에서도 동일합니다.
 
 **왜 ID만 전달하는가?**
-- Navigation 인수는 URL 파라미터처럼 직렬화되므로 크기에 제한이 있음
-- 딥 링크에서도 동일한 경로를 사용할 수 있음
+- Navigation 인수는 직렬화되므로 크기에 제한이 있음
 - 데이터의 단일 진실 공급원(Single Source of Truth) 유지
+- 프로세스 재시작 시에도 ID로 데이터를 다시 로드할 수 있음
 
 ```kotlin [compose-playground]
 // 경로: ID만 정의
 @Serializable
-data class ProductDetail(val productId: Long)
+data class ProductDetail(val productId: Long) : NavKey
 
 // ViewModel: ID를 받아 데이터 로드
 class ProductDetailViewModel(
-    savedStateHandle: SavedStateHandle
+    private val productId: Long,
+    private val repository: ProductRepository
 ) : ViewModel() {
-
-    // SavedStateHandle에서 경로의 인수를 자동으로 읽기
-    private val route = savedStateHandle.toRoute<ProductDetail>()
-    private val productId = route.productId
 
     private val _product = MutableStateFlow<Product?>(null)
     val product: StateFlow<Product?> = _product.asStateFlow()
@@ -153,11 +159,14 @@ class ProductDetailViewModel(
     }
 }
 
-// 화면 컴포저블
-@Composable
-fun ProductDetailScreen(
-    viewModel: ProductDetailViewModel = viewModel()
-) {
+// NavDisplay에서 사용
+entry<ProductDetail> { key ->
+    // key에서 productId를 꺼내 ViewModel에 전달
+    val viewModel: ProductDetailViewModel = viewModel(
+        factory = ProductDetailViewModelFactory(
+            productId = key.productId
+        )
+    )
     val product by viewModel.product.collectAsStateWithLifecycle()
 
     product?.let { item ->
@@ -175,276 +184,198 @@ fun ProductDetailScreen(
 }
 ```
 
+> **Navigation 2.x와의 차이**: 2.x에서는 `SavedStateHandle.toRoute<T>()`로 ViewModel 안에서 인수를 읽었습니다. Navigation3에서는 `entry` 블록의 `key` 파라미터에서 인수를 꺼내 ViewModel 팩토리에 전달하는 패턴이 더 명확합니다.
+
 ---
 
-## 4. SavedStateHandle.toRoute\<T\>()
+## 4. ViewModel 스코핑: NavEntryDecorator
 
-ViewModel에서 Navigation 인수를 읽을 때는 `SavedStateHandle.toRoute<T>()`를 사용합니다. Navigation 라이브러리가 자동으로 경로 인수를 `SavedStateHandle`에 저장해주기 때문입니다.
+Navigation3에서 ViewModel을 화면(NavEntry) 단위로 스코핑하려면 **`NavEntryDecorator`**를 사용합니다. 데코레이터는 NavEntry에 추가적인 기능을 래핑하는 패턴입니다.
+
+### 핵심 데코레이터 두 가지
 
 ```kotlin [compose-playground]
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 
-class DetailViewModel(
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
-
-    // SavedStateHandle에서 타입 안전하게 경로 추출
-    private val route = savedStateHandle.toRoute<Detail>()
-
-    val itemId: Int = route.itemId
-
-    // itemId를 사용해 데이터 로드
-    private val _uiState = MutableStateFlow(DetailUiState())
-    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
-
-    init {
-        loadDetail(itemId)
+NavDisplay(
+    backStack = backStack,
+    onBack = { backStack.removeLastOrNull() },
+    entryDecorators = listOf(
+        // 1. 화면 상태를 저장/복원 (구성 변경, 프로세스 종료 시)
+        rememberSaveableStateHolderNavEntryDecorator(),
+        // 2. ViewModel을 NavEntry 단위로 스코핑
+        rememberViewModelStoreNavEntryDecorator()
+    ),
+    entryProvider = entryProvider {
+        entry<Home> { HomeScreen(/* ... */) }
+        entry<Detail> { key -> DetailScreen(key.itemId) }
     }
-
-    private fun loadDetail(id: Int) {
-        viewModelScope.launch {
-            val item = repository.getItem(id)
-            _uiState.update { it.copy(item = item, isLoading = false) }
-        }
-    }
-}
-
-// NavHost에서 사용
-composable<Detail> {
-    // ViewModel이 자동으로 SavedStateHandle에서 인수를 읽음
-    val viewModel: DetailViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    DetailScreen(uiState = uiState)
-}
+)
 ```
 
-> **팁**: `SavedStateHandle.toRoute<T>()`는 프로세스 종료 후 복원 시에도 인수를 올바르게 복원합니다. 이는 앱이 백그라운드에서 시스템에 의해 종료된 후에도 상태를 유지하는 데 중요합니다.
+**데코레이터 동작 원리:**
+
+| 데코레이터 | 역할 | 생명주기 |
+|-----------|------|---------|
+| `rememberSaveableStateHolderNavEntryDecorator` | `remember`/`rememberSaveable` 상태 보존 | NavEntry가 백 스택에 있는 동안 유지 |
+| `rememberViewModelStoreNavEntryDecorator` | ViewModel을 NavEntry에 스코핑 | NavEntry가 백 스택에서 제거되면 ViewModel도 해제 |
+
+> **핵심**: `rememberViewModelStoreNavEntryDecorator`를 추가하면, `entry` 블록 안에서 `viewModel()`을 호출했을 때 해당 NavEntry에 스코핑된 ViewModel이 생성됩니다. 화면이 백 스택에서 제거되면 ViewModel도 함께 정리됩니다.
 
 ---
 
-## 5. 딥 링크와 Type-Safe 경로
+## 5. 화면 전환 애니메이션: transitionSpec
 
-Type-Safe Navigation에서 딥 링크를 설정할 때, `navDeepLink<T>(basePath = ...)`를 사용하면 경로 클래스의 프로퍼티가 자동으로 URI 파라미터에 매핑됩니다.
+Navigation3에서는 `NavDisplay`에 직접 전환 애니메이션을 설정합니다. 전역 애니메이션과 화면별 커스텀 애니메이션 두 가지 방식을 지원합니다.
 
-```kotlin [compose-playground]
-import androidx.navigation.navDeepLink
-
-val uri = "https://www.myapp.com"
-
-@Serializable
-data class Profile(val id: String)
-
-NavHost(
-    navController = navController,
-    startDestination = Home
-) {
-    composable<Home> {
-        HomeScreen(/* ... */)
-    }
-
-    composable<Profile>(
-        deepLinks = listOf(
-            // https://www.myapp.com/profile/{id}
-            navDeepLink<Profile>(basePath = "$uri/profile")
-        )
-    ) { backStackEntry ->
-        val profile = backStackEntry.toRoute<Profile>()
-        ProfileScreen(profileId = profile.id)
-    }
-}
-```
-
-> **팁**: `navDeepLink<T>(basePath = ...)`는 `@Serializable` 클래스의 프로퍼티명을 URI 경로 파라미터로 자동 매핑합니다. 위 예제에서 `Profile(val id: String)`은 `basePath/profile/{id}` 패턴으로 매핑됩니다.
-
----
-
-## 6. 화면 전환 애니메이션: enterTransition, exitTransition
-
-화면 전환 시 애니메이션을 추가하면 사용자 경험이 크게 향상됩니다. `composable` 블록에 전환 애니메이션을 지정할 수 있습니다.
-
-### 기본 전환 애니메이션
+### 전역 애니메이션 설정
 
 ```kotlin [compose-playground]
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 
-NavHost(
-    navController = navController,
-    startDestination = Home
-) {
-    composable<Home>(
-        // 이 화면으로 들어올 때
-        enterTransition = {
-            fadeIn(animationSpec = tween(300))
-        },
-        // 이 화면에서 나갈 때
-        exitTransition = {
-            fadeOut(animationSpec = tween(300))
-        },
-        // 뒤로 가기로 이 화면에 돌아올 때
-        popEnterTransition = {
-            fadeIn(animationSpec = tween(300))
-        },
-        // 뒤로 가기로 이 화면을 떠날 때
-        popExitTransition = {
-            fadeOut(animationSpec = tween(300))
-        }
-    ) {
+NavDisplay(
+    backStack = backStack,
+    onBack = { backStack.removeLastOrNull() },
+    // 앞으로 이동할 때 (화면이 백 스택에 추가)
+    transitionSpec = {
+        slideInHorizontally(initialOffsetX = { it }) togetherWith
+            slideOutHorizontally(targetOffsetX = { -it })
+    },
+    // 뒤로 갈 때 (화면이 백 스택에서 제거)
+    popTransitionSpec = {
+        slideInHorizontally(initialOffsetX = { -it }) togetherWith
+            slideOutHorizontally(targetOffsetX = { it })
+    },
+    // 예측형 뒤로 가기 제스처
+    predictivePopTransitionSpec = {
+        slideInHorizontally(initialOffsetX = { -it }) togetherWith
+            slideOutHorizontally(targetOffsetX = { it })
+    },
+    entryProvider = entryProvider {
+        entry<Home> { HomeScreen(/* ... */) }
+        entry<Detail> { key -> DetailScreen(key.itemId) }
+    }
+)
+```
+
+### 특정 화면에만 커스텀 애니메이션 적용
+
+`entry`의 `metadata` 파라미터로 화면별 애니메이션을 오버라이드할 수 있습니다.
+
+```kotlin [compose-playground]
+entryProvider = entryProvider {
+    entry<Home> {
         HomeScreen(/* ... */)
     }
-}
-```
 
-### 슬라이드 전환 애니메이션
-
-```kotlin [compose-playground]
-composable<Detail>(
-    enterTransition = {
-        slideInHorizontally(
-            initialOffsetX = { fullWidth -> fullWidth },  // 오른쪽에서 들어옴
-            animationSpec = tween(300)
-        )
-    },
-    exitTransition = {
-        slideOutHorizontally(
-            targetOffsetX = { fullWidth -> -fullWidth },  // 왼쪽으로 나감
-            animationSpec = tween(300)
-        )
-    },
-    popEnterTransition = {
-        slideInHorizontally(
-            initialOffsetX = { fullWidth -> -fullWidth },  // 왼쪽에서 들어옴 (뒤로 가기)
-            animationSpec = tween(300)
-        )
-    },
-    popExitTransition = {
-        slideOutHorizontally(
-            targetOffsetX = { fullWidth -> fullWidth },  // 오른쪽으로 나감 (뒤로 가기)
-            animationSpec = tween(300)
-        )
+    // Detail 화면: 아래에서 위로 슬라이드
+    entry<Detail>(
+        metadata = NavDisplay.transitionSpec {
+            slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = tween(300)
+            ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+        } + NavDisplay.popTransitionSpec {
+            EnterTransition.None togetherWith
+                slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(300)
+                )
+        } + NavDisplay.predictivePopTransitionSpec {
+            EnterTransition.None togetherWith
+                slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(300)
+                )
+        }
+    ) { key ->
+        DetailScreen(itemId = key.itemId)
     }
-) { backStackEntry ->
-    val route = backStackEntry.toRoute<Detail>()
-    DetailScreen(itemId = route.itemId)
 }
 ```
 
-### NavHost 전체에 기본 애니메이션 설정
+**Navigation 2.x와의 비교:**
 
-```kotlin [compose-playground]
-NavHost(
-    navController = navController,
-    startDestination = Home,
-    // 모든 화면에 기본 적용
-    enterTransition = {
-        slideInHorizontally(initialOffsetX = { it }) + fadeIn()
-    },
-    exitTransition = {
-        slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
-    },
-    popEnterTransition = {
-        slideInHorizontally(initialOffsetX = { -it }) + fadeIn()
-    },
-    popExitTransition = {
-        slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-    }
-) {
-    composable<Home> { HomeScreen(/* ... */) }
-    composable<Detail> { DetailScreen(/* ... */) }
-}
-```
+| Navigation 2.x | Navigation3 |
+|----------------|-------------|
+| `composable<T>(enterTransition = { ... })` | `entry<T>(metadata = NavDisplay.transitionSpec { ... })` |
+| `NavHost(enterTransition = { ... })` | `NavDisplay(transitionSpec = { ... })` |
+| `enterTransition` + `exitTransition` (개별 설정) | `ContentTransformSpec` (`togetherWith`로 enter/exit 한 번에 정의) |
+| `popEnterTransition` + `popExitTransition` | `popTransitionSpec` |
 
-> **`+` 연산자**: 여러 애니메이션을 조합할 수 있습니다. `slideInHorizontally() + fadeIn()`은 슬라이드와 페이드를 동시에 적용합니다.
+> **`togetherWith` 연산자**: Navigation3에서는 enter 애니메이션과 exit 애니메이션을 `togetherWith`로 **하나의 ContentTransform으로 결합**합니다. `slideInHorizontally() togetherWith slideOutHorizontally()`는 새 화면이 슬라이드 인하면서 기존 화면이 슬라이드 아웃하는 효과입니다.
 
 ---
 
-## 7. Navigation에서 결과 반환: savedStateHandle
+## 6. 다이얼로그: DialogSceneStrategy
 
-어떤 화면(B)에서 작업한 결과를 이전 화면(A)으로 돌려줘야 할 때, `savedStateHandle`을 활용합니다.
-
-**사용 시나리오**: 필터 선택 화면에서 선택한 필터를 목록 화면으로 반환
-
-### 결과를 보내는 쪽 (B 화면)
+Navigation3에서 다이얼로그를 표시하려면 `DialogSceneStrategy`를 사용합니다. 다이얼로그는 기존 화면 위에 오버레이로 표시됩니다.
 
 ```kotlin [compose-playground]
+import androidx.navigation3.scene.DialogSceneStrategy
+
 @Serializable
-object FilterScreen
+data object ConfirmDialog : NavKey
 
 @Composable
-fun FilterScreen(
-    onApplyFilter: (String) -> Unit
-) {
-    var selectedFilter by remember { mutableStateOf("latest") }
+fun MyApp() {
+    val backStack = rememberNavBackStack(Home)
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("필터 선택", style = MaterialTheme.typography.headlineSmall)
-
-        listOf("latest", "popular", "price_low", "price_high").forEach { filter ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { selectedFilter = filter }
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = selectedFilter == filter,
-                    onClick = { selectedFilter = filter }
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        // DialogSceneStrategy를 sceneStrategy에 설정
+        sceneStrategy = remember { DialogSceneStrategy() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            entry<Home> {
+                HomeScreen(
+                    onShowConfirm = { backStack.add(ConfirmDialog) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = filter)
+            }
+
+            // 다이얼로그로 표시할 항목: metadata에 dialog() 설정
+            entry<ConfirmDialog>(
+                metadata = DialogSceneStrategy.dialog()
+            ) {
+                AlertDialog(
+                    onDismissRequest = { backStack.removeLastOrNull() },
+                    title = { Text("확인") },
+                    text = { Text("정말 삭제하시겠습니까?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            // 삭제 처리
+                            backStack.removeLastOrNull()
+                        }) {
+                            Text("삭제")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { backStack.removeLastOrNull() }) {
+                            Text("취소")
+                        }
+                    }
+                )
             }
         }
-
-        Button(onClick = { onApplyFilter(selectedFilter) }) {
-            Text("적용")
-        }
-    }
-}
-```
-
-### 결과를 받는 쪽 (A 화면)
-
-```kotlin [compose-playground]
-composable<Home> { backStackEntry ->
-    // 이전 화면(B)이 savedStateHandle에 저장한 결과를 관찰
-    val savedStateHandle = backStackEntry.savedStateHandle
-    val filterResult by savedStateHandle
-        .getStateFlow("filter_key", "latest")
-        .collectAsStateWithLifecycle()
-
-    HomeScreen(
-        currentFilter = filterResult,
-        onOpenFilter = { navController.navigate(FilterScreen) }
-    )
-}
-
-composable<FilterScreen> {
-    FilterScreen(
-        onApplyFilter = { selectedFilter ->
-            // 이전 화면의 savedStateHandle에 결과 저장
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.set("filter_key", selectedFilter)
-            // 현재 화면을 닫고 이전 화면으로 돌아감
-            navController.popBackStack()
-        }
     )
 }
 ```
 
-**흐름 정리:**
-1. A 화면 → B 화면으로 이동
-2. B 화면에서 작업 완료
-3. B 화면이 `previousBackStackEntry.savedStateHandle`에 결과 저장
-4. B 화면이 `popBackStack()`으로 종료
-5. A 화면이 자신의 `savedStateHandle`에서 결과를 관찰하여 UI 업데이트
+**Navigation 2.x와의 비교:**
 
-> **주의**: 결과 반환은 간단한 값(문자열, 숫자 등)에만 사용하세요. 복잡한 데이터는 공유 ViewModel이나 Repository 패턴을 사용하는 것이 낫습니다.
+| Navigation 2.x | Navigation3 |
+|----------------|-------------|
+| `dialog<Route> { }` (NavGraphBuilder) | `entry<Route>(metadata = DialogSceneStrategy.dialog()) { }` |
+| 자동으로 다이얼로그로 렌더링 | `sceneStrategy`에 `DialogSceneStrategy()` 설정 필요 |
+
+> **팁**: 다이얼로그를 닫으려면 `backStack.removeLastOrNull()`을 호출하면 됩니다. 일반 화면의 뒤로 가기와 동일한 패턴입니다.
 
 ---
 
-> **다음 문서**: [03. 고급 내비게이션 패턴](03-advanced-navigation.md)에서는 중첩 그래프, 딥 링크, 적응형 내비게이션 등 더 복잡한 패턴을 학습합니다.
+> **다음 문서**: [03. 고급 내비게이션 패턴](03-advanced-navigation.md)에서는 모듈화, 적응형 내비게이션, ViewModel 공유, 상태 관리 등 더 복잡한 패턴을 학습합니다.

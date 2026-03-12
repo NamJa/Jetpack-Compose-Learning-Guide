@@ -158,7 +158,7 @@ my-app/
 | **설정 저장** | DataStore | SharedPreferences 대체 |
 | **직렬화** | Kotlin Serialization | Kotlin 공식, 타입 안전 |
 | **비동기** | Kotlin Coroutines + Flow | Kotlin 공식 |
-| **내비게이션** | Navigation Compose | Jetpack 공식 |
+| **내비게이션** | Navigation3 | Jetpack 공식 (Compose 전용) |
 | **적응형 내비게이션** | material3-adaptive-navigation-suite | 화면 크기별 자동 전환 |
 | **적응형 레이아웃** | material3-adaptive | 태블릿 멀티 패널 |
 | **불변 컬렉션** | kotlinx-collections-immutable | Compose 안정성 |
@@ -312,77 +312,79 @@ class UserPreferences(private val dataStore: DataStore<Preferences>) {
 
 ## 3. Compose + Navigation + ViewModel 통합 패턴
 
-### Navigation 그래프 설계 (Type-Safe Routes — Navigation 2.9.7)
+### Navigation3 엔트리 설계 (NavKey + EntryProviderScope — Navigation3 1.0.1)
 
 ```kotlin [compose-playground]
-// 각 feature 모듈에서 @Serializable 라우트 정의
+// 각 feature 모듈에서 NavKey 라우트 정의
 // feature-home/navigation/HomeNavigation.kt
-@Serializable object HomeRoute
+@Serializable data object HomeRoute : NavKey
 
-fun NavGraphBuilder.homeScreen(
+fun EntryProviderScope<NavKey>.homeSection(
     onNavigateToDetail: (Long) -> Unit
 ) {
-    composable<HomeRoute> {
+    entry<HomeRoute> {
         HomeScreen(onNavigateToDetail = onNavigateToDetail)
     }
 }
 
-fun NavController.navigateToHome() {
-    navigate(HomeRoute) {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
-    }
-}
-
 // feature-detail/navigation/DetailNavigation.kt
-@Serializable data class DetailRoute(val taskId: Long)
+@Serializable data class DetailRoute(val taskId: Long) : NavKey
 
-fun NavGraphBuilder.detailScreen(
+fun EntryProviderScope<NavKey>.detailSection(
     onNavigateBack: () -> Unit
 ) {
-    composable<DetailRoute> {
-        DetailScreen(onNavigateBack = onNavigateBack)
+    entry<DetailRoute> { key ->
+        DetailScreen(
+            taskId = key.taskId,
+            onNavigateBack = onNavigateBack
+        )
     }
-}
-
-fun NavController.navigateToDetail(taskId: Long) {
-    navigate(DetailRoute(taskId))
 }
 ```
 
-### 앱 수준 Navigation 통합
+### 앱 수준 Navigation3 통합
 
 ```kotlin [compose-playground]
-// app/navigation/AppNavGraph.kt
+// app/navigation/AppNavDisplay.kt
 @Composable
-fun AppNavGraph(
-    navController: NavHostController = rememberNavController()
-) {
+fun AppNavDisplay() {
+    val backStack = rememberNavBackStack(HomeRoute)
+
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
-        }
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = HomeRoute,
-            modifier = Modifier.padding(padding)
-        ) {
-            // 각 feature의 Navigation 등록
-            homeScreen(
-                onNavigateToDetail = { taskId ->
-                    navController.navigateToDetail(taskId)
+            BottomNavigationBar(
+                currentRoute = backStack.lastOrNull(),
+                onTabSelected = { route ->
+                    // 중복 방지
+                    if (backStack.lastOrNull() != route) {
+                        backStack.add(route)
+                    }
                 }
             )
-            detailScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-            searchScreen()
-            settingsScreen()
         }
+    ) { padding ->
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.removeLastOrNull() },
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            modifier = Modifier.padding(padding),
+            entryProvider = entryProvider {
+                // 각 feature의 엔트리 등록
+                homeSection(
+                    onNavigateToDetail = { taskId ->
+                        backStack.add(DetailRoute(taskId))
+                    }
+                )
+                detailSection(
+                    onNavigateBack = { backStack.removeLastOrNull() }
+                )
+                searchSection()
+                settingsSection()
+            }
+        )
     }
 }
 ```
@@ -390,24 +392,16 @@ fun AppNavGraph(
 ### ViewModel에서 Navigation 인수 받기
 
 ```kotlin [compose-playground]
-// Hilt + SavedStateHandle로 Navigation 인수 받기
+// Navigation3에서는 entry 블록의 key에서 인수를 꺼내 ViewModel에 전달
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository
 ) : ViewModel() {
-
-    // Navigation 인수 자동 추출
-    private val taskId: Long = checkNotNull(savedStateHandle["taskId"])
 
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    init {
-        loadTask()
-    }
-
-    private fun loadTask() {
+    fun loadTask(taskId: Long) {
         viewModelScope.launch {
             try {
                 val task = taskRepository.getTask(taskId)
@@ -422,6 +416,14 @@ class DetailViewModel @Inject constructor(
         }
     }
 }
+
+// entry 블록에서 key의 인수를 ViewModel에 전달
+// entry<DetailRoute> { key ->
+//     val viewModel: DetailViewModel = hiltViewModel()
+//     LaunchedEffect(key.taskId) { viewModel.loadTask(key.taskId) }
+//     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+//     DetailScreen(uiState = uiState)
+// }
 ```
 
 ---
@@ -698,7 +700,7 @@ hilt = "2.54"
 room = "2.7.1"
 coil = "3.1.0"
 ktor = "3.1.0"
-navigation = "2.9.7"
+navigation3 = "1.0.1"
 lifecycle = "2.10.0"
 ksp = "2.3.10-1.0.31"
 
@@ -712,8 +714,9 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 
-# Navigation
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+# Navigation3
+navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 
 # Lifecycle
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
@@ -753,7 +756,8 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     debugImplementation(libs.bundles.compose.debug)
-    implementation(libs.navigation.compose)
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

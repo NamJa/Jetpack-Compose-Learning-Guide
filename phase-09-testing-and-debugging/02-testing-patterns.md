@@ -610,105 +610,71 @@ fun stateTransition_loadingToSuccess() {
 
 ---
 
-## 7. Navigation 테스트
+## 7. Navigation3 테스트
 
-Compose Navigation을 테스트하려면 `TestNavHostController`를 사용합니다.
+Navigation3에서는 백 스택이 단순한 `SnapshotStateList`이므로, 별도의 `TestNavHostController` 없이 **백 스택을 직접 검증**할 수 있습니다.
 
-### Navigation 테스트 종속성
+### Navigation3 테스트 종속성
 
 ```kotlin [compose-playground]
-// build.gradle.kts
-androidTestImplementation("androidx.navigation:navigation-testing:2.9.7")
+// build.gradle.kts — Navigation3는 별도의 테스트 아티팩트가 필요 없음
+// navigation3-runtime과 navigation3-ui만 있으면 테스트 가능
+androidTestImplementation("androidx.navigation3:navigation3-runtime:1.0.1")
+androidTestImplementation("androidx.navigation3:navigation3-ui:1.0.1")
 ```
 
-### Type-Safe Routes를 사용한 Navigation 테스트
+### NavKey를 사용한 Navigation3 테스트
 
-Navigation Compose에서 type-safe routes(`@Serializable` data class/object)를 사용하는 경우에도 테스트 패턴은 동일하게 `TestNavHostController`를 활용합니다. route 문자열 대신 타입 안전한 route 객체를 사용하면 됩니다.
-
-```kotlin [compose-playground]
-// type-safe route 정의
-@Serializable
-data object HomeRoute
-
-@Serializable
-data class DetailRoute(val id: Int)
-
-@Serializable
-data object SettingsRoute
-
-// 테스트에서 사용
-@Test
-fun navigation_withTypeSafeRoutes_navigatesToDetail() {
-    composeTestRule.setContent {
-        navController = TestNavHostController(LocalContext.current).apply {
-            navigatorProvider.addNavigator(ComposeNavigator())
-        }
-
-        NavHost(
-            navController = navController,
-            startDestination = HomeRoute
-        ) {
-            composable<HomeRoute> { HomeScreen(navController) }
-            composable<DetailRoute> { DetailScreen(navController) }
-        }
-    }
-
-    composeTestRule
-        .onNodeWithText("아이템 1")
-        .performClick()
-
-    // type-safe route를 사용해도 TestNavHostController로 현재 경로 확인 가능
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    assertNotNull(currentRoute)
-}
-```
-
-### 기본 Navigation 테스트 (문자열 route 방식)
+Navigation3에서는 `NavKey` 타입의 백 스택을 직접 검증하므로, 문자열 비교 대신 **타입 안전한 검증**이 가능합니다.
 
 ```kotlin [compose-playground]
+// NavKey 정의
+@Serializable data object HomeRoute : NavKey
+@Serializable data class DetailRoute(val id: Int) : NavKey
+@Serializable data object SettingsRoute : NavKey
+
 class NavigationTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var navController: TestNavHostController
-
     @Test
     fun navigation_startDestination_isHomeScreen() {
-        composeTestRule.setContent {
-            navController = TestNavHostController(LocalContext.current).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
+        val backStack = mutableStateListOf<NavKey>(HomeRoute)
 
-            NavHost(
-                navController = navController,
-                startDestination = "home"
-            ) {
-                composable("home") { HomeScreen(navController) }
-                composable("detail/{id}") { DetailScreen(navController) }
-                composable("settings") { SettingsScreen(navController) }
-            }
+        composeTestRule.setContent {
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
+                    entry<HomeRoute> { HomeScreen(/* ... */) }
+                    entry<DetailRoute> { key -> DetailScreen(id = key.id) }
+                    entry<SettingsRoute> { SettingsScreen() }
+                }
+            )
         }
 
-        // 시작 화면이 home인지 확인
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        assert(currentRoute == "home")
+        // 시작 화면이 HomeRoute인지 타입으로 확인
+        assert(backStack.last() is HomeRoute)
     }
 
     @Test
     fun navigation_clickItem_navigatesToDetail() {
-        composeTestRule.setContent {
-            navController = TestNavHostController(LocalContext.current).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
+        val backStack = mutableStateListOf<NavKey>(HomeRoute)
 
-            NavHost(
-                navController = navController,
-                startDestination = "home"
-            ) {
-                composable("home") { HomeScreen(navController) }
-                composable("detail/{id}") { DetailScreen(navController) }
-            }
+        composeTestRule.setContent {
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
+                    entry<HomeRoute> {
+                        HomeScreen(
+                            onItemClick = { id -> backStack.add(DetailRoute(id)) }
+                        )
+                    }
+                    entry<DetailRoute> { key -> DetailScreen(id = key.id) }
+                }
+            )
         }
 
         // 홈 화면에서 아이템 클릭
@@ -716,25 +682,33 @@ class NavigationTest {
             .onNodeWithText("아이템 1")
             .performClick()
 
-        // detail 화면으로 이동했는지 확인
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        assert(currentRoute == "detail/{id}")
+        // 백 스택을 타입 안전하게 검증
+        assert(backStack.size == 2)
+        assert(backStack.last() is DetailRoute)
+        assert((backStack.last() as DetailRoute).id == 1)
     }
 
     @Test
     fun navigation_backButton_returnsToHome() {
-        composeTestRule.setContent {
-            navController = TestNavHostController(LocalContext.current).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
+        val backStack = mutableStateListOf<NavKey>(HomeRoute)
 
-            NavHost(
-                navController = navController,
-                startDestination = "home"
-            ) {
-                composable("home") { HomeScreen(navController) }
-                composable("settings") { SettingsScreen(navController) }
-            }
+        composeTestRule.setContent {
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
+                    entry<HomeRoute> {
+                        HomeScreen(
+                            onSettings = { backStack.add(SettingsRoute) }
+                        )
+                    }
+                    entry<SettingsRoute> {
+                        SettingsScreen(
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+                }
+            )
         }
 
         // 설정 화면으로 이동
@@ -747,24 +721,36 @@ class NavigationTest {
             .onNodeWithContentDescription("뒤로 가기")
             .performClick()
 
-        // 홈 화면으로 돌아왔는지 확인
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        assert(currentRoute == "home")
+        // 백 스택에 Home만 남았는지 확인
+        assert(backStack.size == 1)
+        assert(backStack.last() is HomeRoute)
     }
 }
 ```
 
-### Navigation 경로 이력 확인
+### 백 스택 이력 확인
 
 ```kotlin [compose-playground]
 @Test
 fun navigation_backStack_isCorrect() {
-    composeTestRule.setContent {
-        navController = TestNavHostController(LocalContext.current).apply {
-            navigatorProvider.addNavigator(ComposeNavigator())
-        }
+    val backStack = mutableStateListOf<NavKey>(HomeRoute)
 
-        AppNavGraph(navController = navController)
+    composeTestRule.setContent {
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.removeLastOrNull() },
+            entryProvider = entryProvider {
+                entry<HomeRoute> {
+                    HomeScreen(onNavigate = { backStack.add(it) })
+                }
+                entry<CategoryRoute> { key ->
+                    CategoryScreen(onNavigate = { backStack.add(it) })
+                }
+                entry<DetailRoute> { key ->
+                    DetailScreen(id = key.id)
+                }
+            }
+        )
     }
 
     // 여러 화면을 이동
@@ -772,15 +758,14 @@ fun navigation_backStack_isCorrect() {
     composeTestRule.onNodeWithText("전자기기").performClick()
     composeTestRule.onNodeWithText("스마트폰").performClick()
 
-    // 백스택 확인
-    val backStack = navController.backStack.map {
-        it.destination.route
-    }
-    assert(backStack.contains("home"))
-    assert(backStack.contains("category"))
-    assert(backStack.contains("detail/smartphone"))
+    // 백 스택을 타입으로 직접 검증 — 문자열 비교 불필요!
+    assert(backStack[0] is HomeRoute)
+    assert(backStack.any { it is CategoryRoute })
+    assert(backStack.last() is DetailRoute)
 }
 ```
+
+> **Navigation 2.x와의 차이**: 2.x에서는 `TestNavHostController`를 설정하고 `destination.route` 문자열을 비교했습니다. Navigation3에서는 백 스택이 일반 리스트이므로, `is` 키워드로 타입 검증하고 프로퍼티에 직접 접근할 수 있습니다. 테스트가 훨씬 간결하고 안전합니다.
 
 ---
 

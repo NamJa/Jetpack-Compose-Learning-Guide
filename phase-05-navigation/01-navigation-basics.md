@@ -1,149 +1,85 @@
-# Navigation Compose 기초
+# Navigation3 기초
 
 > **"앱은 하나의 화면이 아니라, 여러 화면이 유기적으로 연결된 흐름이다."**
 >
-> Navigation Compose는 Jetpack Compose에서 화면 간 이동을 선언적으로 처리하는 공식 라이브러리입니다. 이 문서에서는 Navigation의 핵심 개념부터 실제 화면 전환까지 단계별로 학습합니다.
+> Navigation3는 Jetpack Compose 전용으로 새롭게 설계된 차세대 내비게이션 라이브러리입니다. 기존 Navigation Compose(2.x)의 명령형 `NavController` 대신, **개발자가 직접 백 스택 상태를 소유하고 관리**하는 선언적 접근 방식을 채택합니다. 이 문서에서는 Navigation3의 핵심 개념부터 실제 화면 전환까지 단계별로 학습합니다.
 
 ---
 
 ## 목차
 
-1. [Navigation 종속성 추가](#1-navigation-종속성-추가)
-2. [NavController: rememberNavController()](#2-navcontroller-remembernavcontroller)
-3. [NavHost: startDestination과 NavGraphBuilder](#3-navhost-startdestination과-navgraphbuilder)
-4. [Type-Safe Navigation: @Serializable 데이터 클래스로 경로 정의](#4-type-safe-navigation-serializable-데이터-클래스로-경로-정의)
-5. [composable\<Route\> { } 블록](#5-composableroute--블록)
-6. [navController.navigate()로 화면 이동](#6-navcontrollernavigate로-화면-이동)
-7. [백 스택 관리: popBackStack(), popUpTo, launchSingleTop](#7-백-스택-관리-popbackstack-popupto-launchsingletop)
+1. [Navigation3 종속성 추가](#1-navigation3-종속성-추가)
+2. [NavKey: 경로를 타입 안전하게 정의](#2-navkey-경로를-타입-안전하게-정의)
+3. [백 스택: rememberNavBackStack](#3-백-스택-remembernavbackstack)
+4. [NavDisplay와 entryProvider](#4-navdisplay와-entryprovider)
+5. [entry\<Route\> { } 블록](#5-entryroute--블록)
+6. [화면 이동: backStack.add()](#6-화면-이동-backstackadd)
+7. [뒤로 가기와 백 스택 관리](#7-뒤로-가기와-백-스택-관리)
 
 ---
 
-## 1. Navigation 종속성 추가
+## 1. Navigation3 종속성 추가
 
-Navigation Compose를 사용하려면 프로젝트의 `build.gradle.kts`에 종속성을 추가해야 합니다.
+Navigation3를 사용하려면 프로젝트의 `build.gradle.kts`에 종속성을 추가해야 합니다.
 
-**Navigation Compose**는 Jetpack의 Navigation 컴포넌트를 Compose 환경에 맞게 확장한 라이브러리입니다. `NavHost`, `NavController` 등의 핵심 API를 제공하며, Type-Safe Navigation을 위해 Kotlin Serialization도 함께 추가합니다.
+**Navigation3**는 기존 Navigation Compose(2.x)와 완전히 별개의 라이브러리입니다. `NavDisplay`, `NavKey`, `entryProvider` 등의 새로운 API를 제공하며, Type-Safe Navigation을 위해 Kotlin Serialization도 함께 추가합니다.
 
 ```kotlin [compose-playground]
 // build.gradle.kts (Module: app)
 plugins {
-    // Kotlin Serialization 플러그인 추가 (Type-Safe Navigation에 필요)
-    kotlin("plugin.serialization") version "2.1.0"
+    // Kotlin Serialization 플러그인 추가 (Type-Safe 경로 정의에 필요)
+    kotlin("plugin.serialization") version "2.3.10"
 }
 
 dependencies {
-    // Navigation Compose
-    val navVersion = "2.9.7"
-    implementation("androidx.navigation:navigation-compose:$navVersion")
+    // Navigation3 런타임 + UI
+    implementation("androidx.navigation3:navigation3-runtime:1.0.1")
+    implementation("androidx.navigation3:navigation3-ui:1.0.1")
+
+    // ViewModel 스코핑 (NavEntry 단위로 ViewModel 생명주기 관리)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0")
 
     // Kotlin Serialization (Type-Safe 경로 정의에 필요)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }
 ```
 
-> **XML View 비교**: XML 기반에서는 `navigation-fragment`와 `navigation-ui`를 사용했지만, Compose에서는 `navigation-compose` 하나로 통합됩니다.
+> **Navigation 2.x와의 차이**: 기존에는 `navigation-compose` 하나로 충분했지만, Navigation3에서는 `navigation3-runtime`(핵심)과 `navigation3-ui`(NavDisplay 등 UI 컴포넌트)로 분리됩니다. ViewModel 연동이 필요하면 `lifecycle-viewmodel-navigation3`도 추가합니다.
 
 ---
 
-## 2. NavController: rememberNavController()
+## 2. NavKey: 경로를 타입 안전하게 정의
 
-`NavController`는 Navigation의 중심 객체로, **화면 이동과 백 스택(back stack)을 관리**합니다. Compose에서는 `rememberNavController()`로 생성합니다.
+Navigation3에서 경로(Route)를 정의하려면 **`NavKey` 인터페이스를 구현**하고 `@Serializable`을 붙입니다. 이것이 Navigation 2.x와의 가장 큰 차이 중 하나입니다.
 
-**NavController가 하는 일:**
-- 현재 화면(destination) 추적
-- 화면 간 이동(`navigate()`)
-- 뒤로 가기(`popBackStack()`)
-- 백 스택 상태 관리
-
-```kotlin [compose-playground]
-import androidx.navigation.compose.rememberNavController
-
-@Composable
-fun MyApp() {
-    // NavController 생성 — 컴포지션에서 기억(remember)됨
-    val navController = rememberNavController()
-
-    // NavController를 NavHost에 전달
-    MyNavHost(navController = navController)
-}
-```
-
-> **핵심 포인트**: `rememberNavController()`는 반드시 **컴포저블 계층의 최상위**에서 호출하세요. 화면 전환 시에도 NavController가 유지되어야 하므로, 개별 화면 컴포저블 안에서 생성하면 안 됩니다.
-
----
-
-## 3. NavHost: startDestination과 NavGraphBuilder
-
-`NavHost`는 **화면들을 담는 컨테이너**입니다. 어떤 경로(route)에 어떤 화면을 보여줄지 정의하는 내비게이션 그래프를 구성합니다.
-
-**NavHost의 핵심 파라미터:**
-- `navController`: 화면 이동을 제어하는 컨트롤러
-- `startDestination`: 앱이 시작될 때 처음 보여줄 화면
-- `builder`: `NavGraphBuilder` 람다 — 여기서 각 화면을 등록
-
-```kotlin [compose-playground]
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import kotlinx.serialization.Serializable
-
-@Serializable object Home
-@Serializable data class Detail(val itemId: Int)
-
-@Composable
-fun MyNavHost(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = Home  // @Serializable object를 직접 전달
-    ) {
-        // NavGraphBuilder 블록 — 화면 등록
-        composable<Home> {
-            HomeScreen(
-                onNavigateToDetail = { itemId ->
-                    navController.navigate(Detail(itemId = itemId))
-                }
-            )
-        }
-        composable<Detail> { backStackEntry ->
-            val detail = backStackEntry.toRoute<Detail>()
-            DetailScreen(
-                itemId = detail.itemId,
-                onBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-    }
-}
-```
-
-> **비유**: `NavHost`는 "극장"이고, 각 `composable`은 "무대 위에 올릴 수 있는 연극"입니다. `startDestination`은 "오늘의 첫 공연"을 지정하는 것과 같습니다.
->
-> **참고**: Navigation 2.8 이전의 문자열 기반 경로(`composable("home") { }`)도 여전히 동작하지만, Type-Safe Navigation이 권장 패턴입니다. 위 예제처럼 `@Serializable` 클래스를 사용하세요.
-
----
-
-## 4. Type-Safe Navigation: @Serializable 데이터 클래스로 경로 정의
-
-문자열 기반 경로(`"home"`, `"detail"`)는 오타에 취약합니다. **Navigation 2.8+** 부터는 `@Serializable` 데이터 클래스로 **타입 안전한 경로**를 정의할 수 있습니다. **2.9.x**에서는 이 패턴이 Navigation Compose의 기본 권장 방식입니다.
-
-**왜 Type-Safe Navigation인가?**
-- 문자열 오타로 인한 런타임 크래시 방지
-- 인수(argument)의 타입을 컴파일 타임에 검증
-- IDE 자동완성 지원
+**왜 NavKey인가?**
+- `NavKey`를 구현하면 Navigation3가 백 스택을 직렬화/역직렬화하여 **프로세스 종료 후에도 상태를 복원**할 수 있습니다
+- 타입 안전한 인수 전달 지원
+- IDE 자동완성과 컴파일 타임 검증
 
 ```kotlin [kotlin-playground]
 import kotlinx.serialization.Serializable
+import androidx.navigation3.runtime.NavKey
 
 //sampleStart
-// 경로(Route)를 @Serializable 클래스/오브젝트로 정의
+// 인수가 없는 화면은 object로 정의
 @Serializable
-object Home  // 인수가 없는 화면은 object 사용
+data object Home : NavKey
 
 @Serializable
-object Profile
+data object Profile : NavKey
 
+// 인수가 있는 화면은 data class로 정의
 @Serializable
-data class Detail(val itemId: Int)  // 인수가 있는 화면은 data class 사용
+data class Detail(val itemId: Int) : NavKey
+
+// 여러 인수 + 선택적 인수
+@Serializable
+data class Search(
+    val query: String,
+    val category: String = "all",
+    val page: Int = 1
+) : NavKey
 //sampleEnd
 
 fun main() {
@@ -151,105 +87,148 @@ fun main() {
 }
 ```
 
-이렇게 정의한 경로를 `NavHost`에서 사용합니다:
-
-```kotlin [compose-playground]
-@Composable
-fun MyNavHost(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = Home  // object를 직접 전달
-    ) {
-        composable<Home> {
-            HomeScreen(/* ... */)
-        }
-        composable<Profile> {
-            ProfileScreen(/* ... */)
-        }
-        composable<Detail> { backStackEntry ->
-            // Detail 경로의 인수를 읽는 방법은 다음 섹션에서!
-            DetailScreen(/* ... */)
-        }
-    }
-}
-```
-
-### Non-Reified 대안: KClass 사용
-
-제네릭 `composable<Route>` 외에도 `KClass`를 직접 전달하는 non-reified 방식도 사용할 수 있습니다. 리플렉션이 제한된 환경이나 동적 경로 등록에 유용합니다.
-
-```kotlin [compose-playground]
-// KClass를 사용한 non-reified 방식
-composable(Home::class) {
-    HomeScreen(/* ... */)
-}
-
-composable(Detail::class) { backStackEntry ->
-    val detail = backStackEntry.toRoute<Detail>()
-    DetailScreen(itemId = detail.itemId)
-}
-```
-
-### Value Class를 경로 인수로 사용
-
-Navigation 2.9+에서는 Kotlin value class(인라인 클래스)를 경로 및 인수 타입으로 사용할 수 있습니다.
-
-```kotlin [compose-playground]
-@JvmInline
-value class UserId(val value: String)
-
-@Serializable
-data class UserProfile(val userId: UserId)
-
-// NavHost에서 동일하게 사용
-composable<UserProfile> { backStackEntry ->
-    val route = backStackEntry.toRoute<UserProfile>()
-    ProfileScreen(userId = route.userId)
-}
-```
+> **Navigation 2.x와의 차이**: 2.x에서는 `@Serializable`만 붙이면 됐지만, Navigation3에서는 반드시 `: NavKey`도 구현해야 합니다. 이를 통해 Navigation3가 백 스택 상태를 자동으로 저장/복원합니다.
 
 ---
 
-## 5. composable\<Route\> { } 블록
+## 3. 백 스택: rememberNavBackStack
 
-`composable<Route> { }` 블록은 특정 경로에 대응하는 **화면(컴포저블)을 등록**하는 DSL입니다. Type-Safe Navigation에서는 제네릭 타입으로 경로 클래스를 지정합니다.
+Navigation3에서 가장 큰 패러다임 변화는 **백 스택을 개발자가 직접 소유한다**는 것입니다. 기존의 `NavController`가 내부적으로 관리하던 백 스택이 이제 단순한 `SnapshotStateList`로 노출됩니다.
+
+**`rememberNavBackStack`이 하는 일:**
+- 시작 화면을 포함한 백 스택 생성
+- 구성 변경(화면 회전) 시 상태 유지
+- 프로세스 종료 후에도 백 스택 복원 (NavKey가 `@Serializable`이므로)
 
 ```kotlin [compose-playground]
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.rememberNavBackStack
 
-NavHost(
-    navController = navController,
-    startDestination = Home
-) {
-    // object 경로 — 인수 없음
-    composable<Home> {
+@Composable
+fun MyApp() {
+    // 백 스택 생성 — Home이 시작 화면
+    val backStack = rememberNavBackStack(Home)
+
+    // backStack은 SnapshotStateList<NavKey>
+    // 화면 이동: backStack.add(destination)
+    // 뒤로 가기: backStack.removeLastOrNull()
+
+    MyNavDisplay(backStack = backStack)
+}
+```
+
+> **핵심 포인트**: `rememberNavBackStack()`은 **컴포저블 계층의 최상위**에서 호출하세요. 개별 화면 안에서 생성하면 화면 전환 시 백 스택이 사라집니다.
+>
+> **비유**: Navigation 2.x에서 `NavController`가 "자동 변속기"였다면, Navigation3의 `backStack`은 "수동 변속기"입니다. 개발자가 직접 기어(화면)를 넣고 빼지만, 그만큼 더 정밀하게 제어할 수 있습니다.
+
+---
+
+## 4. NavDisplay와 entryProvider
+
+`NavDisplay`는 **백 스택의 현재 상태를 관찰하고 적절한 화면을 렌더링**하는 컴포저블입니다. Navigation 2.x의 `NavHost`를 대체합니다.
+
+**NavDisplay의 핵심 파라미터:**
+- `backStack`: 화면 이동 상태를 담고 있는 리스트
+- `onBack`: 시스템 뒤로 가기를 처리하는 콜백
+- `entryDecorators`: ViewModel 스코핑, 상태 저장 등의 래퍼
+- `entryProvider`: 각 NavKey를 화면(NavEntry)으로 변환하는 함수
+
+```kotlin [compose-playground]
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+
+@Serializable data object Home : NavKey
+@Serializable data class Detail(val itemId: Int) : NavKey
+
+@Composable
+fun MyApp() {
+    val backStack = rememberNavBackStack(Home)
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            // 화면 상태 저장 (구성 변경 시 유지)
+            rememberSaveableStateHolderNavEntryDecorator(),
+            // ViewModel을 NavEntry 단위로 스코핑
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            entry<Home> {
+                HomeScreen(
+                    onNavigateToDetail = { itemId ->
+                        backStack.add(Detail(itemId = itemId))
+                    }
+                )
+            }
+            entry<Detail> { key ->
+                // key가 Detail 타입으로 직접 전달됨!
+                DetailScreen(
+                    itemId = key.itemId,
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+        }
+    )
+}
+```
+
+> **비유**: `NavDisplay`는 "극장"이고, 각 `entry`는 "무대 위에 올릴 수 있는 연극"입니다. `backStack`의 맨 위에 있는 NavKey가 지금 공연 중인 연극을 결정합니다.
+>
+> **Navigation 2.x와의 차이**: `NavHost`는 내부에 `NavGraphBuilder` DSL로 화면을 등록했지만, `NavDisplay`는 `entryProvider`로 NavKey → NavEntry 변환 로직을 정의합니다. 가장 큰 차이는 **인수 접근 방식**입니다 — `backStackEntry.toRoute<T>()`가 아니라 `entry<T> { key -> }` 람다에서 `key`를 직접 사용합니다.
+
+---
+
+## 5. entry\<Route\> { } 블록
+
+`entry<Route> { }` 블록은 특정 NavKey에 대응하는 **화면(NavEntry)을 등록**하는 DSL입니다.
+
+```kotlin [compose-playground]
+import androidx.navigation3.runtime.entryProvider
+
+val myEntryProvider = entryProvider {
+    // 인수 없는 경로 — object NavKey
+    entry<Home> {
         HomeScreen(
             onItemClick = { itemId ->
-                navController.navigate(Detail(itemId = itemId))
+                backStack.add(Detail(itemId = itemId))
             }
         )
     }
 
-    // data class 경로 — 인수 있음
-    composable<Detail> { backStackEntry ->
-        // toRoute<T>()로 타입 안전하게 인수 추출
-        val detail: Detail = backStackEntry.toRoute<Detail>()
-        DetailScreen(itemId = detail.itemId)
+    // 인수 있는 경로 — data class NavKey
+    // 람다 파라미터 key가 Detail 타입으로 전달됨
+    entry<Detail> { key ->
+        DetailScreen(itemId = key.itemId)
+    }
+
+    // 메타데이터가 있는 항목 (예: 전환 애니메이션)
+    entry<Profile>(
+        metadata = mapOf("customKey" to "customValue")
+    ) {
+        ProfileScreen()
     }
 }
 ```
 
-**backStackEntry 활용:**
-- `backStackEntry.toRoute<T>()`: 경로 객체를 타입 안전하게 복원
-- `backStackEntry.savedStateHandle`: 화면 간 결과 전달에 사용
+**Navigation 2.x의 `composable<Route>` 블록과의 비교:**
+
+| Navigation 2.x | Navigation3 |
+|----------------|-------------|
+| `composable<Detail> { backStackEntry -> }` | `entry<Detail> { key -> }` |
+| `backStackEntry.toRoute<Detail>()` | `key`를 직접 사용 (이미 `Detail` 타입) |
+| `composable(Detail::class) { }` (KClass) | `entry<Detail> { }` (제네릭만 사용) |
+
+> **핵심 차이**: Navigation 2.x에서는 `backStackEntry.toRoute<T>()`로 역직렬화가 필요했지만, Navigation3에서는 `entry<T> { key -> }` 람다에 이미 타입 안전한 key 객체가 전달됩니다. 더 간결하고 직관적입니다.
 
 ---
 
-## 6. navController.navigate()로 화면 이동
+## 6. 화면 이동: backStack.add()
 
-화면을 이동할 때는 `navController.navigate()`에 **경로 객체를 전달**합니다.
+화면을 이동할 때는 **`backStack.add()`에 NavKey 객체를 전달**합니다. Navigation 2.x의 `navController.navigate()`를 대체합니다.
 
 ```kotlin [compose-playground]
 @Composable
@@ -283,81 +262,145 @@ fun HomeScreen(
     }
 }
 
-// 호출하는 쪽 (NavHost 내부)
-composable<Home> {
+// NavDisplay 내부에서 연결
+entry<Home> {
     HomeScreen(
         onItemClick = { itemId ->
-            // Detail data class에 인수 전달
-            navController.navigate(Detail(itemId = itemId))
+            // NavKey 객체를 백 스택에 추가
+            backStack.add(Detail(itemId = itemId))
         },
         onProfileClick = {
-            navController.navigate(Profile)
+            backStack.add(Profile)
         }
     )
 }
 ```
 
-> **베스트 프랙티스**: 화면 컴포저블에는 `navController`를 직접 전달하지 마세요. 대신 `onNavigate`, `onBack` 같은 **콜백 람다**를 전달하면 테스트와 미리보기가 쉬워집니다.
+**Navigation 2.x와의 비교:**
+
+```kotlin [compose-playground]
+// Navigation 2.x
+navController.navigate(Detail(itemId = 42))
+
+// Navigation3
+backStack.add(Detail(itemId = 42))
+```
+
+> **베스트 프랙티스**: 화면 컴포저블에는 `backStack`을 직접 전달하지 마세요. 대신 `onNavigate`, `onBack` 같은 **콜백 람다**를 전달하면 테스트와 미리보기가 쉬워집니다. 이 원칙은 Navigation 2.x와 동일합니다.
 
 ---
 
-## 7. 백 스택 관리: popBackStack(), popUpTo, launchSingleTop
+## 7. 뒤로 가기와 백 스택 관리
 
-**백 스택(back stack)** 은 사용자가 방문한 화면의 기록입니다. Navigation은 자동으로 백 스택을 관리하지만, 특수한 경우 직접 제어해야 할 때가 있습니다.
+Navigation3에서는 백 스택이 단순한 리스트이므로, **리스트 조작으로 백 스택을 제어**합니다.
 
-### popBackStack() — 뒤로 가기
+### 뒤로 가기
 
 ```kotlin [compose-playground]
 // 현재 화면을 백 스택에서 제거하고 이전 화면으로 돌아감
-navController.popBackStack()
-
-// 특정 경로까지 백 스택을 되감기
-navController.popBackStack<Home>(inclusive = false)
-// inclusive = false: Home 화면은 유지
-// inclusive = true: Home 화면도 제거
+backStack.removeLastOrNull()
 ```
 
-### popUpTo — 이동하면서 백 스택 정리
+### 시스템 뒤로 가기 처리
 
-로그인 후 홈으로 이동할 때, 뒤로 가면 로그인 화면이 다시 나오면 안 됩니다. `popUpTo`로 이전 화면들을 정리할 수 있습니다.
+`NavDisplay`의 `onBack` 파라미터가 시스템 뒤로 가기를 처리합니다.
 
 ```kotlin [compose-playground]
-// 로그인 성공 후 홈으로 이동 — 로그인 화면을 백 스택에서 제거
-navController.navigate(Home) {
-    popUpTo<Login> {
-        inclusive = true  // Login 화면도 백 스택에서 제거
+NavDisplay(
+    backStack = backStack,
+    // 시스템 뒤로 가기 시 호출
+    onBack = { backStack.removeLastOrNull() },
+    entryProvider = entryProvider { /* ... */ }
+)
+```
+
+### 특정 화면까지 백 스택 되감기
+
+Navigation 2.x의 `popUpTo`에 해당하는 패턴입니다. 리스트 조작으로 직접 구현합니다.
+
+```kotlin [compose-playground]
+// 로그인 성공 후 홈으로 이동 — 로그인 관련 화면 모두 제거
+fun navigateToHomeAfterLogin(backStack: SnapshotStateList<NavKey>) {
+    // Login 화면까지(포함) 모든 항목 제거
+    while (backStack.lastOrNull() !is Home && backStack.size > 1) {
+        backStack.removeLastOrNull()
+    }
+    // Home이 없으면 추가
+    if (backStack.lastOrNull() !is Home) {
+        backStack.add(Home)
     }
 }
 ```
 
-### launchSingleTop — 중복 화면 방지
+### 중복 화면 방지
 
-같은 화면을 여러 번 쌓이지 않도록 합니다. 예를 들어 하단 탭에서 같은 탭을 반복 클릭할 때 유용합니다.
+Navigation 2.x의 `launchSingleTop`에 해당하는 패턴입니다.
 
 ```kotlin [compose-playground]
 // 같은 화면이 이미 스택 최상단에 있으면 새로 생성하지 않음
-navController.navigate(Home) {
-    launchSingleTop = true
+fun navigateIfNotAlreadyOnTop(backStack: SnapshotStateList<NavKey>, destination: NavKey) {
+    if (backStack.lastOrNull() != destination) {
+        backStack.add(destination)
+    }
 }
 ```
 
 ### 하단 내비게이션에서 자주 쓰는 패턴
 
+하단 탭 전환 시에는 별도의 백 스택을 탭마다 관리하는 것이 일반적입니다. Navigation3에서는 `rememberNavBackStack`을 탭별로 생성하고, 현재 활성 탭의 백 스택만 `NavDisplay`에 전달합니다.
+
 ```kotlin [compose-playground]
-fun navigateToTab(navController: NavController, route: Any) {
-    navController.navigate(route) {
-        // 시작 화면까지의 백 스택 정리 (시작 화면은 유지)
-        popUpTo(navController.graph.findStartDestination().id) {
-            saveState = true  // 이전 탭의 상태 저장
+@Composable
+fun MainApp() {
+    var currentTab by remember { mutableStateOf(Tab.Home) }
+
+    // 탭별 독립 백 스택
+    val homeBackStack = rememberNavBackStack(HomeRoute)
+    val searchBackStack = rememberNavBackStack(SearchRoute)
+    val profileBackStack = rememberNavBackStack(ProfileRoute)
+
+    // 현재 탭에 맞는 백 스택 선택
+    val activeBackStack = when (currentTab) {
+        Tab.Home -> homeBackStack
+        Tab.Search -> searchBackStack
+        Tab.Profile -> profileBackStack
+    }
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                Tab.entries.forEach { tab ->
+                    NavigationBarItem(
+                        selected = currentTab == tab,
+                        onClick = { currentTab = tab },
+                        icon = { Icon(tab.icon, contentDescription = null) },
+                        label = { Text(tab.label) }
+                    )
+                }
+            }
         }
-        launchSingleTop = true     // 같은 탭 중복 방지
-        restoreState = true        // 저장된 탭 상태 복원
+    ) { padding ->
+        NavDisplay(
+            backStack = activeBackStack,
+            onBack = { activeBackStack.removeLastOrNull() },
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            modifier = Modifier.padding(padding),
+            entryProvider = entryProvider {
+                entry<HomeRoute> { HomeScreen(/* ... */) }
+                entry<SearchRoute> { SearchScreen(/* ... */) }
+                entry<ProfileRoute> { ProfileScreen(/* ... */) }
+                // 하위 화면들...
+            }
+        )
     }
 }
 ```
 
-> **정리**: 백 스택 관리에서 가장 흔한 패턴은 (1) 로그인 → 홈 이동 시 `popUpTo + inclusive`, (2) 하단 탭 전환 시 `popUpTo + saveState + restoreState + launchSingleTop`입니다.
+> **정리**: Navigation3에서 백 스택 관리는 **리스트 조작**입니다. `add()`로 이동하고, `removeLastOrNull()`로 뒤로 가고, `while` 루프로 특정 지점까지 되감습니다. Navigation 2.x의 `popUpTo`, `launchSingleTop` 같은 옵션은 직접 로직으로 구현하지만, 그만큼 더 투명하고 디버깅하기 쉽습니다.
 
 ---
 
-> **다음 문서**: [02. 화면 전환과 인수 전달](02-screen-transitions-and-arguments.md)에서는 화면 간 데이터 전달, 전환 애니메이션, 결과 반환 등 더 실용적인 패턴을 학습합니다.
+> **다음 문서**: [02. 화면 전환과 인수 전달](02-screen-transitions-and-arguments.md)에서는 인수 전달 패턴, ViewModel 연동, 화면 전환 애니메이션, 다이얼로그 등 더 실용적인 패턴을 학습합니다.

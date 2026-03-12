@@ -30,7 +30,7 @@
   - [04. ViewModel과 Compose 연동](phase-04-state-management/04-viewmodel-integration.md)
 
 - **Phase 5: 내비게이션**
-  - [01. Navigation Compose 기초](phase-05-navigation/01-navigation-basics.md)
+  - [01. Navigation3 기초](phase-05-navigation/01-navigation-basics.md)
   - [02. 화면 전환과 인수 전달](phase-05-navigation/02-screen-transitions-and-arguments.md)
   - [03. 고급 내비게이션 패턴](phase-05-navigation/03-advanced-navigation.md)
 

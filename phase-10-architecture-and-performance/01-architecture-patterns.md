@@ -242,11 +242,11 @@ fun SearchContent(
 
 ## 3. UI Layer: Screen → ViewModel → UiState
 
-> **2026 업데이트 (Lifecycle 2.10.0 / Navigation 2.9.7)**
+> **2026 업데이트 (Lifecycle 2.10.0 / Navigation3 1.0.1)**
 >
 > - `rememberLifecycleOwner`를 사용하면 Compose 트리 내에서 스코프된 생명주기를 직접 다룰 수 있습니다.
-> - `lifecycle-viewmodel-navigation3` 아티팩트가 추가되어, Navigation3에서 ViewModel 스코핑이 가능합니다.
-> - `savedStateHandle.toRoute<Route>()`를 통해 타입 안전한 내비게이션 인수 추출이 가능합니다.
+> - `lifecycle-viewmodel-navigation3` 아티팩트를 통해, Navigation3에서 ViewModel을 NavEntry 단위로 스코핑할 수 있습니다.
+> - Navigation3에서는 `entry<Route> { key -> }` 블록에서 타입 안전한 인수(`key`)에 직접 접근합니다.
 > - `CreationExtras` 빌더 함수 문법으로 ViewModel 팩토리를 더 간결하게 작성할 수 있습니다.
 
 ### Lifecycle 2.10.0: rememberLifecycleOwner
@@ -272,26 +272,29 @@ fun ScopedScreen() {
 }
 ```
 
-### 타입 안전한 Navigation 인수: savedStateHandle.toRoute()
+### 타입 안전한 Navigation3 인수: entry { key -> }
 
 ```kotlin [kotlin-playground]
 fun main() {
 //sampleStart
-// Navigation 경로를 @Serializable data class로 정의
+// Navigation3 경로를 @Serializable data class + NavKey로 정의
 @Serializable
-data class DetailRoute(val taskId: Long)
+data class DetailRoute(val taskId: Long) : NavKey
 
-@HiltViewModel
-class DetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+// NavDisplay의 entryProvider에서 key를 직접 전달받음
+// entry<DetailRoute> { key ->
+//     val viewModel: DetailViewModel = viewModel(
+//         factory = DetailViewModelFactory(taskId = key.taskId)
+//     )
+//     DetailScreen(viewModel = viewModel)
+// }
+
+// ViewModel은 팩토리를 통해 인수를 전달받음
+class DetailViewModel(
+    private val taskId: Long,
     private val taskRepository: TaskRepository
 ) : ViewModel() {
-
-    // 타입 안전하게 Navigation 인수를 추출
-    private val route = savedStateHandle.toRoute<DetailRoute>()
-    private val taskId: Long = route.taskId
-
-    // ...
+    // taskId를 사용해 데이터 로드
 }
 //sampleEnd
 }
@@ -1326,4 +1329,4 @@ fun CustomLayout(
 - 상태 읽기 연기와 derivedStateOf
 - Baseline Profiles
 
-> **참고**: 이 문서의 예제는 Kotlin 2.3.10, Compose BOM 2026.02.01, Lifecycle 2.10.0, Navigation 2.9.7 기준입니다.
+> **참고**: 이 문서의 예제는 Kotlin 2.3.10, Compose BOM 2026.02.01, Lifecycle 2.10.0, Navigation3 1.0.1 기준입니다.

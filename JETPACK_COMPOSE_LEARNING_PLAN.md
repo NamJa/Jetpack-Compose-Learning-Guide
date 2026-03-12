@@ -32,7 +32,7 @@
 | Design System | Material Design 3 | 1.4.0 | MotionScheme, TextAutoSize, SecureTextField |
 | Compose Compiler | Kotlin Plugin | 2.3.10 | `org.jetbrains.kotlin.plugin.compose` |
 | Architecture | MVVM + UDF | — | 단방향 데이터 흐름 |
-| Navigation | Navigation Compose | 2.9.7 | `@Serializable` 타입 안전 라우팅 |
+| Navigation | Navigation3 | 1.0.1 | `NavKey` + `NavDisplay` 선언적 내비게이션 |
 | Lifecycle | AndroidX Lifecycle | 2.10.0 | `collectAsStateWithLifecycle`, Min SDK 23 |
 | State Management | State + ViewModel | — | TextFieldState, Compose 내장 상태 관리 |
 | Async | Kotlin Coroutines + Flow | — | 비동기 처리 |
@@ -173,7 +173,7 @@ Compose 개발에 필수적인 Kotlin 핵심:
 
 ### 5-1. 학습 목표
 
-- Navigation Compose 설정과 NavHost/NavController 사용
+- Navigation3 설정과 NavDisplay/NavKey/백 스택 사용
 - `@Serializable` 기반 타입 안전 라우팅으로 화면 간 이동과 인수 전달
 - 중첩 내비게이션과 딥 링크
 - NavigationSuiteScaffold로 적응형 내비게이션 구현
