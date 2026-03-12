@@ -41,10 +41,14 @@
     var COMPILE_URL = COMPOSE_SERVER + '/api/compiler/translate?compiler=compose-wasm';
     var VERSIONS_URL = COMPOSE_SERVER + '/api/resource/compose-wasm-versions';
 
+    // Korean font URL (Spoqa Han Sans Neo Regular TTF - 511KB subset covering common Hangul)
+    var KOREAN_FONT_URL = 'https://cdn.jsdelivr.net/gh/spoqa/spoqa-han-sans@latest/Subset/SpoqaHanSansNeo/SpoqaHanSansNeo-Regular.ttf';
+
     // Cached resources (persists across runs within same page session)
     var _versions = null;
     var _skikoMjsText = null;
     var _stdlibMjsText = null;
+    var _koreanFontBytes = null;
 
     function getVersions() {
       if (_versions) return Promise.resolve(_versions);
@@ -92,11 +96,22 @@
           );
           patched = patched.replace(
             "(extends) => { return { extends }; }",
-            "(extends_) => { return { extends_ }; }"
+            "(extends_) => { return { extends: extends_ }; }"
           );
           _stdlibMjsText = patched;
           return _stdlibMjsText;
         });
+    }
+
+    function fetchKoreanFont() {
+      if (_koreanFontBytes) return Promise.resolve(_koreanFontBytes);
+      return fetch(KOREAN_FONT_URL)
+        .then(function(r) { return r.arrayBuffer(); })
+        .then(function(buf) {
+          _koreanFontBytes = new Uint8Array(buf);
+          return _koreanFontBytes;
+        })
+        .catch(function() { return null; });
     }
 
     function toBase64(str) {
@@ -217,10 +232,8 @@
       iframeDoc.open();
       iframeDoc.write(
         '<!DOCTYPE html><html><head>' +
-        '<style>*{margin:0;padding:0;}html,body{height:100%;overflow:hidden;background:#fff;}</style>' +
-        '</head><body>' +
-        '<canvas id="ComposeTarget" height="1000" style="width:100%;"></canvas>' +
-        '</body></html>'
+        '<style>*{margin:0;padding:0;}html,body{width:100%;height:100%;overflow:hidden;background:#fff;}</style>' +
+        '</head><body></body></html>'
       );
       iframeDoc.close();
 
@@ -243,20 +256,27 @@
               return stdlibModule.instantiate({ "./skiko.mjs": fixedSkikoExports(skikoExports) });
             });
         })
-        .then(function() {
+        .then(function(stdlibResult) {
           if (onStatus) onStatus('\u23F3 \uC571 \uC2E4\uD589 \uC911...');
-          iframeWin.wasmCode = Uint8Array.from(
-            atob(compileResult.wasm),
-            function(c) { return c.charCodeAt(0); }
-          );
-          var prepared = prepareCompiledCode(compileResult.jsCode);
-          return evalModule(iframeWin, prepared);
-        })
-        .then(function(result) {
-          if (result && result.bufferedOutput && result.bufferedOutput.buffer) {
-            return result.bufferedOutput.buffer;
-          }
-          return '';
+          // Preload Korean font into iframe window for Kotlin code to access
+          return fetchKoreanFont().then(function(fontBytes) {
+            iframeWin.__koreanFontBytes = fontBytes;
+            iframeWin.wasmCode = Uint8Array.from(
+              atob(compileResult.wasm),
+              function(c) { return c.charCodeAt(0); }
+            );
+            var prepared = prepareCompiledCode(compileResult.jsCode);
+            return evalModule(iframeWin, prepared).then(function(compiledModule) {
+              return compiledModule.instantiate({
+                'playground.master': stdlibResult.exports
+              }).then(function(appResult) {
+                if (appResult && appResult.exports && appResult.exports.main) {
+                  appResult.exports.main();
+                }
+                return compiledModule.bufferedOutput ? compiledModule.bufferedOutput.buffer : '';
+              });
+            });
+          });
         });
     }
 
@@ -618,10 +638,29 @@
         'import androidx.compose.ui.*',
         'import androidx.compose.ui.unit.*',
         'import androidx.compose.ui.graphics.*',
+        'import androidx.compose.ui.text.font.FontFamily',
+        'import androidx.compose.ui.text.font.FontWeight',
+        'import androidx.compose.ui.text.font.FontStyle',
+        'import androidx.compose.ui.text.platform.Font',
         'import androidx.compose.ui.window.ComposeViewport',
         'import kotlinx.browser.document',
         'import org.jetbrains.compose.resources.*'
       ].join('\n');
+
+      // Korean font loading helpers (font bytes are pre-loaded by JS into window.__koreanFontBytes)
+      var fontHelpers =
+        '@JsFun("() => window.__koreanFontBytes || null")\n' +
+        'external fun __getKoreanFontBytes(): JsAny?\n' +
+        '@JsFun("(a) => a.length")\n' +
+        'external fun __jsFontLen(a: JsAny): Int\n' +
+        '@JsFun("(a,i) => a[i]")\n' +
+        'external fun __jsFontGet(a: JsAny, i: Int): Byte\n' +
+        'fun __loadKoreanFont(): FontFamily? {\n' +
+        '    val js = __getKoreanFontBytes() ?: return null\n' +
+        '    val len = __jsFontLen(js)\n' +
+        '    val bytes = ByteArray(len) { __jsFontGet(js, it) }\n' +
+        '    return FontFamily(Font("NotoSansKR", bytes, FontWeight.Normal, FontStyle.Normal))\n' +
+        '}\n';
 
       // Detect if code defines @Composable functions (vs inline composable calls)
       var composableFuncMatch = code.match(/@Composable\s+fun\s+(\w+)/);
@@ -630,20 +669,28 @@
         // Code defines composable function(s) - keep at top level, call the first one
         var firstFunc = composableFuncMatch[1];
         wrappedCode = imports + '\n\n' +
+          fontHelpers + '\n' +
           code + '\n\n' +
           '@OptIn(ExperimentalComposeUiApi::class)\n' +
           'fun main() {\n' +
+          '    val __kf = __loadKoreanFont()\n' +
           '    ComposeViewport(document.body!!) {\n' +
-          '        ' + firstFunc + '()\n' +
+          '        MaterialTheme(typography = if (__kf != null) Typography(defaultFontFamily = __kf) else Typography()) {\n' +
+          '            ' + firstFunc + '()\n' +
+          '        }\n' +
           '    }\n' +
           '}';
       } else {
         // Inline composable content - wrap in App()
         wrappedCode = imports + '\n\n' +
+          fontHelpers + '\n' +
           '@OptIn(ExperimentalComposeUiApi::class)\n' +
           'fun main() {\n' +
+          '    val __kf = __loadKoreanFont()\n' +
           '    ComposeViewport(document.body!!) {\n' +
-          '        App()\n' +
+          '        MaterialTheme(typography = if (__kf != null) Typography(defaultFontFamily = __kf) else Typography()) {\n' +
+          '            App()\n' +
+          '        }\n' +
           '    }\n' +
           '}\n\n' +
           '@Composable\n' +
