@@ -630,18 +630,40 @@
     var wrappedCode = code;
     if (code.indexOf('fun main()') === -1) {
       var imports = [
-        'import androidx.compose.animation.*',
+        'import androidx.compose.runtime.*',
+        // UI
+        'import androidx.compose.ui.*',
+        'import androidx.compose.ui.graphics.*',
+        'import androidx.compose.ui.graphics.drawscope.*',
+        'import androidx.compose.ui.text.*',
+        'import androidx.compose.ui.text.font.*',
+        'import androidx.compose.ui.text.style.*',
+        'import androidx.compose.ui.unit.*',
+        'import androidx.compose.ui.draw.*',
+        'import androidx.compose.ui.layout.*',
+        'import androidx.compose.ui.platform.*',
+        'import androidx.compose.ui.window.*',
+        // Foundation
         'import androidx.compose.foundation.*',
         'import androidx.compose.foundation.layout.*',
+        'import androidx.compose.foundation.shape.*',
+        'import androidx.compose.foundation.lazy.*',
+        'import androidx.compose.foundation.lazy.grid.*',
+        'import androidx.compose.foundation.text.*',
+        'import androidx.compose.foundation.gestures.*',
+        'import androidx.compose.foundation.interaction.*',
+        'import androidx.compose.foundation.pager.*',
+        // Material 3
         'import androidx.compose.material.*',
-        'import androidx.compose.runtime.*',
-        'import androidx.compose.ui.*',
-        'import androidx.compose.ui.unit.*',
-        'import androidx.compose.ui.graphics.*',
-        'import androidx.compose.ui.text.font.FontFamily',
-        'import androidx.compose.ui.text.font.FontWeight',
-        'import androidx.compose.ui.text.font.FontStyle',
+        'import androidx.compose.material.icons.*',
+        'import androidx.compose.material.icons.filled.*',
+        'import androidx.compose.material.icons.outlined.*',
+        // Animation
+        'import androidx.compose.animation.*',
+        'import androidx.compose.animation.core.*',
+        // Font interop
         'import androidx.compose.ui.text.platform.Font',
+        // WASM entry
         'import androidx.compose.ui.window.ComposeViewport',
         'import kotlinx.browser.document',
         'import org.jetbrains.compose.resources.*'
