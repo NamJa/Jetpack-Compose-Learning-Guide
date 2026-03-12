@@ -598,6 +598,31 @@
 }
 
 /* ==========================================================================
+   Force Dark Mode for Playgrounds
+   Syntax highlighting is always Darcula, so the container must stay dark too.
+   Override theme variables when the page is in light mode.
+   ========================================================================== */
+
+[data-theme="light"] .playground-container {
+  --bg-card: #22223b;
+  --bg-secondary: #282c34;
+  --bg-tertiary: #2d3748;
+  --bg-code: #1e1e2e;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0aec0;
+  --text-muted: #718096;
+  --text-inverse: #1a1a2e;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-strong: rgba(255, 255, 255, 0.2);
+  --accent: #61dafb;
+  --accent-hover: #79e3ff;
+  --accent-muted: rgba(97, 218, 251, 0.15);
+  --error: #e94560;
+  --success: #4ecdc4;
+}
+
+/* ==========================================================================
    Syntax Highlighting (IntelliJ Darcula Style for Kotlin/Compose)
    ========================================================================== */
 
